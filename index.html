@@ -1,0 +1,2024 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AIcontrast — Discover the Best AI Tools & Models</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+
+    :root {
+      --brand-from: #6366f1;
+      --brand-to:   #8b5cf6;
+      --bg-base:    #07080f;
+      --bg-card:    #0f1117;
+      --bg-card-hover: #141620;
+      --border:     rgba(255,255,255,0.06);
+      --border-hover: rgba(99,102,241,0.45);
+      color-scheme: dark;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--bg-base);
+      color: #e2e8f0;
+      min-height: 100vh;
+    }
+
+    /* ── Brand gradient text ── */
+    .g-text {
+      background: linear-gradient(135deg, #818cf8 0%, #a78bfa 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* ── Hero gradient bg ── */
+    .hero-bg {
+      background:
+        radial-gradient(ellipse 80% 50% at 50% -10%, rgba(99,102,241,0.18) 0%, transparent 70%),
+        var(--bg-base);
+    }
+
+    /* ── Glassmorphism card ── */
+    .glass {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      backdrop-filter: blur(10px);
+    }
+
+    /* ── AI card ── */
+    .ai-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+    .ai-card::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(99,102,241,0.04) 0%, rgba(139,92,246,0.04) 100%);
+      opacity: 0; transition: opacity 0.2s ease;
+      border-radius: inherit;
+      pointer-events: none;
+    }
+    .ai-card:hover { transform: translateY(-3px); border-color: var(--border-hover); box-shadow: 0 8px 40px rgba(99,102,241,0.16); }
+    .ai-card:hover::before { opacity: 1; }
+
+    /* ── Featured card ── */
+    .feat-card {
+      background: linear-gradient(145deg, #0f1117 0%, #13141f 100%);
+      border: 1px solid rgba(99,102,241,0.2);
+      border-radius: 16px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+    .feat-card::after {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(99,102,241,0.6), transparent);
+    }
+    .feat-card:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(99,102,241,0.2); }
+
+    /* ── Search ── */
+    .search-wrap { position: relative; }
+    .search-input {
+      width: 100%;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 14px;
+      padding: 14px 52px;
+      font-size: 15px;
+      color: #e2e8f0;
+      font-family: 'Inter', sans-serif;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      outline: none;
+    }
+    .search-input::placeholder { color: #4b5563; }
+    .search-input:focus {
+      border-color: rgba(99,102,241,0.6);
+      box-shadow: 0 0 0 3px rgba(99,102,241,0.12), 0 0 28px rgba(99,102,241,0.1);
+    }
+
+    /* ── Sidebar nav items ── */
+    .cat-btn {
+      display: flex; align-items: center; justify-content: space-between;
+      width: 100%; padding: 8px 12px; border-radius: 10px;
+      font-size: 13px; font-weight: 500;
+      transition: all 0.15s ease;
+      border-left: 2px solid transparent;
+      color: #6b7280;
+      text-align: left;
+      cursor: pointer;
+    }
+    .cat-btn:hover:not(.active) { background: rgba(255,255,255,0.04); color: #d1d5db; }
+    .cat-btn.active {
+      background: rgba(99,102,241,0.12);
+      border-left-color: #6366f1;
+      color: #a5b4fc;
+    }
+
+    /* ── Badge ── */
+    .badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 2px 8px; border-radius: 100px;
+      font-size: 10px; font-weight: 600; letter-spacing: 0.02em;
+    }
+    .badge-new     { background: rgba(16,185,129,0.15); color: #34d399; border: 1px solid rgba(16,185,129,0.25); }
+    .badge-top     { background: rgba(245,158,11,0.15); color: #fbbf24; border: 1px solid rgba(245,158,11,0.25); }
+    .badge-popular { background: rgba(99,102,241,0.15); color: #a5b4fc; border: 1px solid rgba(99,102,241,0.25); }
+    .badge-free    { background: rgba(20,184,166,0.15); color: #2dd4bf; border: 1px solid rgba(20,184,166,0.25); }
+
+    /* ── Category color dots ── */
+    .cat-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+
+    /* ── Modal ── */
+    @keyframes fadeIn  { from { opacity: 0 } to { opacity: 1 } }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(20px) scale(0.98) } to { opacity: 1; transform: translateY(0) scale(1) } }
+    .modal-bg   { animation: fadeIn  0.2s ease; }
+    .modal-card { animation: slideUp 0.25s ease; }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar        { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-track  { background: transparent; }
+    ::-webkit-scrollbar-thumb  { background: rgba(255,255,255,0.1); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+    .no-sb { -ms-overflow-style: none; scrollbar-width: none; }
+    .no-sb::-webkit-scrollbar { display: none; }
+
+    /* ── Misc ── */
+    .line-clamp-2 {
+      display: -webkit-box; -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .line-clamp-3 {
+      display: -webkit-box; -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical; overflow: hidden;
+    }
+    select { cursor: pointer; }
+    select option { background: #1e2030; }
+
+    /* ── Stat card pulse dot ── */
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+    .pulse-dot { animation: pulse 2s ease infinite; }
+
+    /* ── Rating bar ── */
+    .r-bar { transition: width 0.5s cubic-bezier(.4,0,.2,1); }
+
+    /* ── Glow button ── */
+    .btn-brand {
+      background: linear-gradient(135deg, #6366f1, #7c3aed);
+      color: white; font-weight: 600;
+      border-radius: 10px;
+      transition: filter 0.2s, transform 0.15s;
+    }
+    .btn-brand:hover { filter: brightness(1.12); transform: translateY(-1px); }
+    .btn-brand:active { transform: translateY(0); filter: brightness(0.96); }
+
+    /* ── Sort tab buttons ── */
+    .sort-btn {
+      padding: 6px 14px; border-radius: 8px;
+      font-size: 12px; font-weight: 500;
+      transition: all 0.15s;
+      color: #6b7280;
+      white-space: nowrap;
+    }
+    .sort-btn:hover:not(.sort-active) { background: rgba(255,255,255,0.05); color: #d1d5db; }
+    .sort-btn.sort-active { background: rgba(99,102,241,0.15); color: #a5b4fc; }
+
+    /* ── View toggle ── */
+    .view-btn { padding: 6px 8px; border-radius: 7px; transition: all 0.15s; color: #4b5563; }
+    .view-btn.active, .view-btn:hover { background: rgba(255,255,255,0.07); color: #d1d5db; }
+
+    /* List view card */
+    .list-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      cursor: pointer;
+    }
+    .list-card:hover { border-color: var(--border-hover); box-shadow: 0 4px 24px rgba(99,102,241,0.1); }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     HEADER
+════════════════════════════════════════════════════════════════ -->
+<header style="position:fixed;top:0;left:0;right:0;z-index:50;border-bottom:1px solid rgba(255,255,255,0.06);background:rgba(7,8,15,0.85);backdrop-filter:blur(20px);">
+  <div style="max-width:1600px;margin:0 auto;padding:0 24px;display:flex;align-items:center;gap:20px;height:60px;">
+
+    <!-- Logo -->
+    <a href="#" onclick="resetAll();return false;" style="display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0;">
+      <div style="width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,#6366f1,#7c3aed);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:white;letter-spacing:-0.5px;box-shadow:0 0 16px rgba(99,102,241,0.4);">AI</div>
+      <span style="font-size:18px;font-weight:800;background:linear-gradient(135deg,#818cf8,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:-0.3px;">AIcontrast</span>
+    </a>
+
+    <!-- Search -->
+    <div class="search-wrap" style="flex:1;max-width:580px;">
+      <svg style="position:absolute;left:16px;top:50%;transform:translateY(-50%);color:#4b5563;pointer-events:none;" xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+      <input id="searchInput" type="text" class="search-input" placeholder="Search tools, capabilities, categories…" autocomplete="off"/>
+      <button id="clearBtn" onclick="clearSearch()" style="display:none;position:absolute;right:14px;top:50%;transform:translateY(-50%);color:#4b5563;transition:color 0.15s;background:none;border:none;cursor:pointer;padding:4px;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+
+    <!-- Nav pills (desktop) -->
+    <nav style="display:none;align-items:center;gap:4px;flex-shrink:0;" class="md-flex" id="headerNav">
+      <a href="#featured" style="padding:6px 14px;border-radius:8px;font-size:13px;font-weight:500;color:#9ca3af;text-decoration:none;transition:all 0.15s;" onmouseover="this.style.background='rgba(255,255,255,0.06)';this.style.color='#e2e8f0'" onmouseout="this.style.background='';this.style.color='#9ca3af'">Featured</a>
+      <a href="#tools" style="padding:6px 14px;border-radius:8px;font-size:13px;font-weight:500;color:#9ca3af;text-decoration:none;transition:all 0.15s;" onmouseover="this.style.background='rgba(255,255,255,0.06)';this.style.color='#e2e8f0'" onmouseout="this.style.background='';this.style.color='#9ca3af'">All Tools</a>
+    </nav>
+
+    <!-- Right -->
+    <div style="margin-left:auto;flex-shrink:0;display:flex;align-items:center;gap:10px;">
+      <span id="hdrCount" style="font-size:11px;font-weight:500;color:#4b5563;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);padding:5px 12px;border-radius:100px;"></span>
+    </div>
+  </div>
+</header>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     HERO
+════════════════════════════════════════════════════════════════ -->
+<section class="hero-bg" style="padding:80px 24px 52px;text-align:center;margin-top:60px;">
+  <div style="max-width:680px;margin:0 auto;">
+    <!-- Eyebrow -->
+    <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(99,102,241,0.1);border:1px solid rgba(99,102,241,0.25);padding:5px 14px;border-radius:100px;font-size:11px;font-weight:600;color:#a5b4fc;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:24px;">
+      <span class="pulse-dot" style="width:6px;height:6px;border-radius:50%;background:#6366f1;display:inline-block;"></span>
+      78 AI Tools Indexed · Updated Daily
+    </div>
+
+    <h1 style="font-size:clamp(2rem,5vw,3.2rem);font-weight:900;line-height:1.1;letter-spacing:-1.5px;color:#f1f5f9;margin-bottom:16px;">
+      Find the Perfect<br/>
+      <span class="g-text">AI Tool</span> for Your Work
+    </h1>
+    <p style="font-size:16px;color:#6b7280;max-width:480px;margin:0 auto 36px;line-height:1.7;">
+      Search, compare, and discover the best AI tools and models — ranked by real user ratings across every category.
+    </p>
+
+    <!-- Hero search (large) -->
+    <div class="search-wrap" style="max-width:560px;margin:0 auto 40px;">
+      <svg style="position:absolute;left:18px;top:50%;transform:translateY(-50%);color:#4b5563;pointer-events:none;" xmlns="http://www.w3.org/2000/svg" width="19" height="19" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+      <input id="heroSearch" type="text" class="search-input" style="font-size:15px;padding:16px 56px;" placeholder="Try "video generation" or "coding assistant"…" autocomplete="off"/>
+    </div>
+
+    <!-- Quick category pills -->
+    <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;">
+      <span style="font-size:12px;color:#4b5563;padding:6px 2px;align-self:center;">Browse:</span>
+      <button onclick="setCategory('Chatbots & LLMs')" style="padding:6px 14px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:100px;font-size:12px;font-weight:500;color:#9ca3af;cursor:pointer;transition:all 0.15s;" onmouseover="this.style.borderColor='rgba(99,102,241,0.4)';this.style.color='#a5b4fc'" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)';this.style.color='#9ca3af'">💬 Chatbots</button>
+      <button onclick="setCategory('Image Generation')" style="padding:6px 14px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:100px;font-size:12px;font-weight:500;color:#9ca3af;cursor:pointer;transition:all 0.15s;" onmouseover="this.style.borderColor='rgba(99,102,241,0.4)';this.style.color='#a5b4fc'" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)';this.style.color='#9ca3af'">🎨 Image AI</button>
+      <button onclick="setCategory('Coding Assistants')" style="padding:6px 14px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:100px;font-size:12px;font-weight:500;color:#9ca3af;cursor:pointer;transition:all 0.15s;" onmouseover="this.style.borderColor='rgba(99,102,241,0.4)';this.style.color='#a5b4fc'" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)';this.style.color='#9ca3af'">💻 Code AI</button>
+      <button onclick="setCategory('Video & Animation')" style="padding:6px 14px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:100px;font-size:12px;font-weight:500;color:#9ca3af;cursor:pointer;transition:all 0.15s;" onmouseover="this.style.borderColor='rgba(99,102,241,0.4)';this.style.color='#a5b4fc'" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)';this.style.color='#9ca3af'">🎬 Video AI</button>
+      <button onclick="setCategory('Audio & Music')" style="padding:6px 14px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:100px;font-size:12px;font-weight:500;color:#9ca3af;cursor:pointer;transition:all 0.15s;" onmouseover="this.style.borderColor='rgba(99,102,241,0.4)';this.style.color='#a5b4fc'" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)';this.style.color='#9ca3af'">🎵 Audio AI</button>
+    </div>
+  </div>
+
+  <!-- Stat strip -->
+  <div style="max-width:700px;margin:48px auto 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:1px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.06);border-radius:16px;overflow:hidden;">
+    <div style="background:#0f1117;padding:20px 24px;text-align:center;">
+      <div style="font-size:24px;font-weight:800;color:#f1f5f9;letter-spacing:-0.5px;">78+</div>
+      <div style="font-size:11px;color:#4b5563;font-weight:500;margin-top:3px;text-transform:uppercase;letter-spacing:0.05em;">AI Tools</div>
+    </div>
+    <div style="background:#0f1117;padding:20px 24px;text-align:center;">
+      <div style="font-size:24px;font-weight:800;color:#f1f5f9;letter-spacing:-0.5px;">9</div>
+      <div style="font-size:11px;color:#4b5563;font-weight:500;margin-top:3px;text-transform:uppercase;letter-spacing:0.05em;">Categories</div>
+    </div>
+    <div style="background:#0f1117;padding:20px 24px;text-align:center;">
+      <div style="font-size:24px;font-weight:800;color:#f1f5f9;letter-spacing:-0.5px;">4.6★</div>
+      <div style="font-size:11px;color:#4b5563;font-weight:500;margin-top:3px;text-transform:uppercase;letter-spacing:0.05em;">Avg Rating</div>
+    </div>
+    <div style="background:#0f1117;padding:20px 24px;text-align:center;">
+      <div style="font-size:24px;font-weight:800;color:#f1f5f9;letter-spacing:-0.5px;">1M+</div>
+      <div style="font-size:11px;color:#4b5563;font-weight:500;margin-top:3px;text-transform:uppercase;letter-spacing:0.05em;">Reviews</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     FEATURED STRIP
+════════════════════════════════════════════════════════════════ -->
+<section id="featured" style="max-width:1600px;margin:0 auto;padding:32px 24px 0;">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div style="width:3px;height:18px;background:linear-gradient(180deg,#6366f1,#8b5cf6);border-radius:2px;"></div>
+      <h2 style="font-size:15px;font-weight:700;color:#e2e8f0;letter-spacing:-0.2px;">Editor's Picks</h2>
+      <span class="badge badge-top">⭐ Top Rated</span>
+    </div>
+    <button onclick="setCategory('All')" style="font-size:12px;font-weight:500;color:#6366f1;background:none;border:none;cursor:pointer;transition:opacity 0.15s;" onmouseover="this.style.opacity=0.7" onmouseout="this.style.opacity=1">View all →</button>
+  </div>
+  <div id="featuredStrip" class="no-sb" style="display:flex;gap:14px;overflow-x:auto;padding-bottom:4px;"></div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     MAIN LAYOUT (sidebar + grid)
+════════════════════════════════════════════════════════════════ -->
+<div id="tools" style="max-width:1600px;margin:0 auto;padding:32px 24px 60px;display:flex;gap:28px;align-items:flex-start;">
+
+  <!-- ─── SIDEBAR ─── -->
+  <aside style="width:220px;flex-shrink:0;position:sticky;top:76px;" id="sidebar" class="lg-sidebar">
+    <!-- Categories -->
+    <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:18px 14px;margin-bottom:14px;">
+      <p style="font-size:10px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:0.1em;padding:0 4px;margin-bottom:10px;">Categories</p>
+      <nav id="sidebarNav" style="display:flex;flex-direction:column;gap:2px;"></nav>
+    </div>
+
+    <!-- Sort -->
+    <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:18px 14px;margin-bottom:14px;">
+      <p style="font-size:10px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:0.1em;padding:0 4px;margin-bottom:10px;">Sort by</p>
+      <div id="sortButtons" style="display:flex;flex-direction:column;gap:2px;">
+        <button onclick="setSort('popular')" class="sort-btn" data-sort="popular">🔥 Most Popular</button>
+        <button onclick="setSort('rated')"   class="sort-btn" data-sort="rated">⭐ Best Rated</button>
+        <button onclick="setSort('newest')"  class="sort-btn" data-sort="newest">🆕 Newest</button>
+        <button onclick="setSort('az')"      class="sort-btn" data-sort="az">🔤 A → Z</button>
+      </div>
+    </div>
+
+    <!-- Quick stats -->
+    <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:18px 14px;">
+      <p style="font-size:10px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:0.1em;padding:0 4px;margin-bottom:12px;">Index Stats</p>
+      <div style="display:flex;flex-direction:column;gap:9px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:12px;color:#4b5563;">Total tools</span>
+          <span style="font-size:12px;font-weight:700;color:#e2e8f0;font-variant-numeric:tabular-nums;" id="stTotal">—</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:12px;color:#4b5563;">Categories</span>
+          <span style="font-size:12px;font-weight:700;color:#e2e8f0;">9</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:12px;color:#4b5563;">Avg rating</span>
+          <span style="font-size:12px;font-weight:700;color:#fbbf24;" id="stAvg">—</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:12px;color:#4b5563;">Total reviews</span>
+          <span style="font-size:12px;font-weight:700;color:#e2e8f0;" id="stReviews">—</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ─── MAIN ─── -->
+  <div style="flex:1;min-width:0;">
+
+    <!-- Mobile chips -->
+    <div id="mobileChips" class="no-sb" style="display:flex;gap:8px;overflow-x:auto;padding-bottom:10px;margin-bottom:16px;"></div>
+
+    <!-- Toolbar -->
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px;">
+      <div>
+        <h2 id="pageTitle" style="font-size:20px;font-weight:800;color:#f1f5f9;letter-spacing:-0.4px;"></h2>
+        <p id="pageSubtitle" style="font-size:12px;color:#4b5563;margin-top:3px;"></p>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <!-- Desktop sort chips -->
+        <div id="sortChips" style="display:none;gap:4px;"></div>
+        <!-- View toggle -->
+        <div style="display:flex;gap:2px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:9px;padding:3px;">
+          <button id="gridViewBtn" class="view-btn active" onclick="setView('grid')" title="Grid view">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" viewBox="0 0 16 16"><path d="M1 2.5A1.5 1.5 0 012.5 1h3A1.5 1.5 0 017 2.5v3A1.5 1.5 0 015.5 7h-3A1.5 1.5 0 011 5.5v-3zm8 0A1.5 1.5 0 0110.5 1h3A1.5 1.5 0 0115 2.5v3A1.5 1.5 0 0113.5 7h-3A1.5 1.5 0 019 5.5v-3zm-8 8A1.5 1.5 0 012.5 9h3A1.5 1.5 0 017 10.5v3A1.5 1.5 0 015.5 15h-3A1.5 1.5 0 011 13.5v-3zm8 0A1.5 1.5 0 0110.5 9h3a1.5 1.5 0 011.5 1.5v3A1.5 1.5 0 0113.5 15h-3A1.5 1.5 0 019 13.5v-3z"/></svg>
+          </button>
+          <button id="listViewBtn" class="view-btn" onclick="setView('list')" title="List view">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M2.5 12a.5.5 0 01.5-.5h10a.5.5 0 010 1H3a.5.5 0 01-.5-.5zm0-4a.5.5 0 01.5-.5h10a.5.5 0 010 1H3a.5.5 0 01-.5-.5zm0-4a.5.5 0 01.5-.5h10a.5.5 0 010 1H3a.5.5 0 01-.5-.5z"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Grid -->
+    <div id="toolsGrid"></div>
+
+    <!-- Empty state -->
+    <div id="emptyState" style="display:none;text-align:center;padding:80px 24px;">
+      <div style="font-size:52px;margin-bottom:16px;">🔍</div>
+      <h3 style="font-size:18px;font-weight:700;color:#e2e8f0;margin-bottom:8px;">No results found</h3>
+      <p style="font-size:14px;color:#4b5563;max-width:320px;margin:0 auto 24px;line-height:1.6;">Try different keywords, or browse all categories to discover what's available.</p>
+      <button onclick="resetAll()" class="btn-brand" style="display:inline-block;padding:10px 24px;font-size:13px;border:none;">Reset Search</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     FOOTER
+════════════════════════════════════════════════════════════════ -->
+<footer style="border-top:1px solid rgba(255,255,255,0.05);padding:40px 24px;">
+  <div style="max-width:1600px;margin:0 auto;display:flex;flex-wrap:wrap;gap:24px;align-items:center;justify-content:space-between;">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div style="width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#6366f1,#7c3aed);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:white;">AI</div>
+      <span style="font-size:15px;font-weight:700;background:linear-gradient(135deg,#818cf8,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">AIcontrast</span>
+      <span style="font-size:12px;color:#374151;margin-left:4px;">The AI Tools Directory</span>
+    </div>
+    <p style="font-size:12px;color:#374151;">© 2025 AIcontrast · Built for AI explorers everywhere</p>
+  </div>
+</footer>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     MODAL
+════════════════════════════════════════════════════════════════ -->
+<div id="modal" style="display:none;position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;padding:20px;">
+  <div class="modal-bg" onclick="closeModal()" style="position:absolute;inset:0;background:rgba(0,0,0,0.8);backdrop-filter:blur(8px);"></div>
+  <div class="modal-card glass" id="modalCard" style="position:relative;width:100%;max-width:680px;max-height:92vh;overflow-y:auto;border-radius:20px;box-shadow:0 24px 80px rgba(0,0,0,0.6);">
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     COMPARE MODAL
+════════════════════════════════════════════════════════════════ -->
+<div id="compareModal" style="display:none;position:fixed;inset:0;z-index:110;align-items:center;justify-content:center;padding:20px;">
+  <div onclick="closeCompareModal()" style="position:absolute;inset:0;background:rgba(0,0,0,0.85);backdrop-filter:blur(10px);"></div>
+  <div class="glass" style="position:relative;width:100%;max-width:900px;max-height:92vh;border-radius:20px;box-shadow:0 24px 80px rgba(0,0,0,0.6);overflow:hidden;display:flex;flex-direction:column;">
+    <div id="compareModalContent"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     COMPARE FLOATING BAR
+════════════════════════════════════════════════════════════════ -->
+<div id="compareBar" style="display:none;position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:90;min-width:360px;max-width:780px;width:calc(100vw - 40px);background:rgba(15,17,23,0.96);border:1px solid rgba(99,102,241,0.25);border-radius:16px;padding:12px 16px;box-shadow:0 16px 48px rgba(0,0,0,0.5),0 0 0 1px rgba(99,102,241,0.08);backdrop-filter:blur(16px);display:none;align-items:center;gap:12px;"></div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     TOAST
+════════════════════════════════════════════════════════════════ -->
+<div id="toast" style="position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(8px);z-index:200;background:rgba(30,32,42,0.96);border:1px solid rgba(255,255,255,0.1);border-radius:100px;padding:10px 20px;font-size:13px;font-weight:500;color:#e2e8f0;opacity:0;transition:opacity 0.25s,transform 0.25s;pointer-events:none;white-space:nowrap;box-shadow:0 8px 24px rgba(0,0,0,0.4);"></div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     DATA + LOGIC
+════════════════════════════════════════════════════════════════ -->
+<script>
+/* ────────────────────────────────────────────────────────
+   CATEGORY COLORS
+──────────────────────────────────────────────────────── */
+const CAT_COLOR = {
+  "Chatbots & LLMs":    "#6366f1",
+  "Image Generation":   "#ec4899",
+  "Video & Animation":  "#f59e0b",
+  "Audio & Music":      "#10b981",
+  "Coding Assistants":  "#3b82f6",
+  "Data & Analytics":   "#8b5cf6",
+  "Productivity":       "#06b6d4",
+  "Research & Science": "#ef4444",
+  "3D & Design":        "#f97316",
+};
+
+const CAT_ICONS = {
+  "All":"🌐","Chatbots & LLMs":"💬","Image Generation":"🎨",
+  "Video & Animation":"🎬","Audio & Music":"🎵","Coding Assistants":"💻",
+  "Data & Analytics":"📊","Productivity":"⚡","Research & Science":"🔬","3D & Design":"🎯"
+};
+
+const CATEGORIES = [
+  "All","Chatbots & LLMs","Image Generation","Video & Animation",
+  "Audio & Music","Coding Assistants","Data & Analytics",
+  "Productivity","Research & Science","3D & Design"
+];
+
+/* ────────────────────────────────────────────────────────
+   LOGOS  — 3-tier: Clearbit → Google Favicon → Emoji
+──────────────────────────────────────────────────────── */
+const TOOL_LOGOS = {
+  1:'openai.com',        2:'anthropic.com',     3:'x.ai',              4:'google.com',
+  5:'perplexity.ai',     6:'midjourney.com',    7:'openai.com',        8:'stability.ai',
+  9:'adobe.com',         10:'blackforestlabs.ai',11:'runway.ml',       12:'openai.com',
+  13:'pika.art',         14:'suno.ai',          15:'elevenlabs.io',    16:'udio.com',
+  17:'cursor.com',       18:'github.com',       19:'tabnine.com',      20:'notion.so',
+  21:'otter.ai',         22:'julius.ai',        23:'consensus.app',    24:'spline.design',
+  25:'meta.com',         26:'microsoft.com',    27:'character.ai',     28:'deepseek.com',
+  29:'mistral.ai',       30:'pi.ai',            31:'poe.com',          32:'cohere.com',
+  33:'ideogram.ai',      34:'leonardo.ai',      35:'playground.com',   36:'krea.ai',
+  37:'magnific.ai',      38:'canva.com',        39:'kling.ai',         40:'lumalabs.ai',
+  41:'heygen.com',       42:'synthesia.io',     43:'descript.com',     44:'invideo.io',
+  45:'soundraw.io',      46:'aiva.ai',          47:'lalal.ai',         48:'play.ht',
+  49:'adobe.com',        50:'codeium.com',      51:'replit.com',       52:'amazon.com',
+  53:'cognition.ai',     54:'stackblitz.com',   55:'vercel.com',       56:'lovable.dev',
+  57:'aider.chat',       58:'tableau.com',      59:'microsoft.com',    60:'datarobot.com',
+  61:'polymersearch.com',62:'akkio.com',        63:'grammarly.com',    64:'jasper.ai',
+  65:'copy.ai',          66:'gamma.app',        67:'tome.app',         68:'reclaim.ai',
+  69:'mem.ai',           70:'superhuman.com',   71:'elicit.com',       72:'scite.ai',
+  73:'researchrabbit.ai',74:'scholarcy.com',    75:'figma.com',        76:'uizard.io',
+  77:'meshy.ai',         78:'looka.com'
+};
+
+/*
+  3-tier logo fallback:
+    1. Clearbit  (logo.clearbit.com)     — high-quality SVG/PNG
+    2. Google Favicon API (sz=128)       — always available, lower res
+    3. Emoji                             — last resort
+*/
+function logoErr(img) {
+  const p = img.parentNode; if (!p) return;
+  if (!img.dataset.tried) {
+    // Tier 2: Google Favicon
+    img.dataset.tried = '1';
+    const d = p.dataset.domain;
+    img.style.borderRadius = '4px';
+    img.src = `https://www.google.com/s2/favicons?sz=128&domain_url=https://${d}`;
+  } else {
+    // Tier 3: Emoji
+    p.style.background = 'rgba(255,255,255,0.05)';
+    p.style.border     = '1px solid rgba(255,255,255,0.08)';
+    p.style.padding    = '0';
+    p.innerHTML = `<span style="font-size:${p.dataset.fsz}px;line-height:1;">${p.dataset.emoji}</span>`;
+  }
+}
+
+function logoHTML(t, sz=48) {
+  const domain = TOOL_LOGOS[t.id];
+  const br  = Math.round(sz * 0.27);
+  const pad = Math.round(sz * 0.13);
+  const fsz = Math.round(sz * 0.48);
+  const base = `width:${sz}px;height:${sz}px;border-radius:${br}px;flex-shrink:0;display:flex;align-items:center;justify-content:center;overflow:hidden;`;
+  if (!domain) {
+    return `<div style="${base}background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);font-size:${fsz}px;">${t.emoji}</div>`;
+  }
+  return `<div data-emoji="${t.emoji}" data-fsz="${fsz}" data-domain="${domain}" style="${base}background:#ffffff;border:1px solid rgba(0,0,0,0.07);padding:${pad}px;">
+    <img src="https://logo.clearbit.com/${domain}" alt="${t.name}" loading="lazy"
+         style="width:100%;height:100%;object-fit:contain;"
+         onerror="logoErr(this)"/>
+  </div>`;
+}
+
+/* ────────────────────────────────────────────────────────
+   DATA
+──────────────────────────────────────────────────────── */
+const TOOLS = [
+  /* ── CHATBOTS & LLMs ─────────────────────────────────── */
+  {
+    id:1, name:"ChatGPT", emoji:"🤖", category:"Chatbots & LLMs",
+    tags:["Chatbots & LLMs","Productivity"], badge:"popular",
+    shortDesc:"OpenAI's flagship conversational AI — writing, coding, analysis, and complex multi-step reasoning.",
+    longDesc:"ChatGPT is OpenAI's conversational AI built on the GPT-4o architecture. It handles natural language, writes code, creates documents, solves math problems, and interprets images. The GPT Store offers thousands of custom GPTs for specialized tasks. With Advanced Voice Mode, code interpreter, image generation, and browsing built in, ChatGPT is the most feature-complete AI assistant available.",
+    rating:4.8, reviews:142500, year:2022, popularity:1000000, website:"https://chat.openai.com",
+    pros:["Industry-leading reasoning","Massive plugin & GPT ecosystem","Multimodal (text, images, voice)","Constant feature updates"],
+    cons:["Can hallucinate confidently","Free tier rate limits","Privacy concerns"],
+    breakdown:{Accuracy:4.7,Usability:4.9,Speed:4.5,Value:4.4}
+  },
+  {
+    id:2, name:"Claude", emoji:"🌟", category:"Chatbots & LLMs",
+    tags:["Chatbots & LLMs","Research & Science","Productivity"], badge:"top",
+    shortDesc:"Anthropic's thoughtful AI with a 200K token context window — ideal for long docs and nuanced writing.",
+    longDesc:"Claude by Anthropic is designed around being helpful, harmless, and honest. With a 200K-token context window, it handles entire codebases, lengthy research papers, and complex multi-document tasks without losing context. Claude 3.5 Sonnet is widely considered the best model for writing quality, nuanced analysis, and careful long-form reasoning.",
+    rating:4.9, reviews:87300, year:2023, popularity:850000, website:"https://claude.ai",
+    pros:["200K token context window","Best-in-class writing quality","Honest about limitations","Strong safety alignment"],
+    cons:["No built-in image generation","Fewer third-party integrations","Can be cautious on edge cases"],
+    breakdown:{Accuracy:4.9,Usability:4.8,Speed:4.7,Value:4.6}
+  },
+  {
+    id:3, name:"Grok", emoji:"⚡", category:"Chatbots & LLMs",
+    tags:["Chatbots & LLMs"], badge:null,
+    shortDesc:"xAI's real-time AI with X/web access, built-in image generation, and a witty irreverent personality.",
+    longDesc:"Grok is xAI's large language model deeply integrated with the X platform. Its killer feature is real-time access to X posts and trending topics, making it uniquely useful for social media analysis and breaking news. Grok 2 introduced Aurora image generation, improved reasoning, and stronger multimodal understanding.",
+    rating:4.3, reviews:42100, year:2023, popularity:420000, website:"https://grok.x.ai",
+    pros:["Real-time X & web data","Built-in image generation","Direct personality","Included with X Premium"],
+    cons:["Requires X Premium","Accuracy lags competitors","Smaller ecosystem"],
+    breakdown:{Accuracy:4.1,Usability:4.4,Speed:4.5,Value:4.0}
+  },
+  {
+    id:4, name:"Gemini", emoji:"💎", category:"Chatbots & LLMs",
+    tags:["Chatbots & LLMs","Productivity","Research & Science"], badge:"popular",
+    shortDesc:"Google DeepMind's multimodal AI with a 1M token context window and deep Google Workspace integration.",
+    longDesc:"Gemini is Google DeepMind's flagship AI, available in Ultra, Pro, and Flash variants. Gemini 1.5 Pro boasts a 1-million-token context window — enough to process an entire feature-length film transcript. Native integration with Gmail, Docs, Sheets, YouTube, and Search makes it uniquely powerful inside the Google ecosystem.",
+    rating:4.5, reviews:96200, year:2023, popularity:780000, website:"https://gemini.google.com",
+    pros:["1M token context window","Deep Google ecosystem integration","Natively multimodal","Generous free tier"],
+    cons:["Inconsistent quality across tasks","Slower on heavy prompts","Can over-hedge"],
+    breakdown:{Accuracy:4.4,Usability:4.6,Speed:4.2,Value:4.7}
+  },
+  {
+    id:5, name:"Perplexity AI", emoji:"🔎", category:"Research & Science",
+    tags:["Research & Science","Chatbots & LLMs"], badge:"top",
+    shortDesc:"AI-powered answer engine with real-time web search and cited sources — perfect for research.",
+    longDesc:"Perplexity AI is an AI search engine that combines real-time web crawling with large language models to deliver concise, cited answers. Unlike traditional search engines, it synthesises information from multiple sources. Pro subscribers can choose between GPT-4o, Claude, and Sonar models.",
+    rating:4.7, reviews:58900, year:2022, popularity:520000, website:"https://perplexity.ai",
+    pros:["Real-time web search with citations","Multiple model choices","Academic paper search mode","Clean fast interface"],
+    cons:["Occasionally incorrect citations","Limited free queries","Less creative than pure LLMs"],
+    breakdown:{Accuracy:4.6,Usability:4.8,Speed:4.7,Value:4.5}
+  },
+  {
+    id:6, name:"Midjourney", emoji:"🎨", category:"Image Generation",
+    tags:["Image Generation","3D & Design"], badge:"top",
+    shortDesc:"The gold standard for AI art — stunning, painterly images with an iconic aesthetic unmatched by rivals.",
+    longDesc:"Midjourney produces some of the most visually impressive AI-generated images available. Operating through Discord and its own web UI, it has developed a signature aesthetic that blends painterly richness with photographic detail. V6 introduced significantly improved photorealism and stronger prompt adherence.",
+    rating:4.9, reviews:118700, year:2022, popularity:920000, website:"https://midjourney.com",
+    pros:["Unmatched artistic image quality","Distinctive signature aesthetic","Thriving creative community","Regular model improvements"],
+    cons:["No free tier","Discord-centric workflow","Slower generation than rivals"],
+    breakdown:{Accuracy:4.8,Usability:4.3,Speed:4.1,Value:4.5}
+  },
+  {
+    id:7, name:"DALL·E 3", emoji:"🖼️", category:"Image Generation",
+    tags:["Image Generation","Productivity"], badge:null,
+    shortDesc:"OpenAI's image generator with best-in-class prompt adherence and seamless ChatGPT integration.",
+    longDesc:"DALL·E 3 is OpenAI's image generation model notable for its outstanding prompt adherence. It generates images that closely match even complex, detailed descriptions. It handles text in images far better than most competitors, and its deep integration inside ChatGPT means you can refine images through natural conversation.",
+    rating:4.6, reviews:84200, year:2023, popularity:680000, website:"https://openai.com/dall-e-3",
+    pros:["Best prompt understanding","Text within images works reliably","Integrated into ChatGPT","Strong safety filters"],
+    cons:["Conservative content policy","Raw quality below Midjourney","Limited stylistic control"],
+    breakdown:{Accuracy:4.8,Usability:4.7,Speed:4.5,Value:4.3}
+  },
+  {
+    id:8, name:"Stable Diffusion", emoji:"🌊", category:"Image Generation",
+    tags:["Image Generation"], badge:"free",
+    shortDesc:"Open-source image generation you run locally — unlimited, uncensored, and infinitely customizable.",
+    longDesc:"Stable Diffusion by Stability AI is the world's leading open-source image generation model. Run it on your own GPU with no API costs. An enormous ecosystem of community-trained models, LoRA fine-tunes, ControlNet extensions, and UIs make it infinitely flexible.",
+    rating:4.5, reviews:102300, year:2022, popularity:750000, website:"https://stability.ai",
+    pros:["Completely free & open-source","Runs fully locally","Thousands of community models","Unlimited generations"],
+    cons:["Requires technical setup","Quality varies by model","No official support"],
+    breakdown:{Accuracy:4.3,Usability:3.8,Speed:4.6,Value:5.0}
+  },
+  {
+    id:9, name:"Adobe Firefly", emoji:"🔥", category:"Image Generation",
+    tags:["Image Generation","3D & Design"], badge:null,
+    shortDesc:"Commercially safe AI image generation trained on licensed content — built into Creative Cloud.",
+    longDesc:"Adobe Firefly is trained exclusively on licensed Adobe Stock and public domain content, making it safe to use commercially. Deep integration into Photoshop's Generative Fill and Illustrator's vector generation makes it the most practical AI for professional designers.",
+    rating:4.4, reviews:47800, year:2023, popularity:380000, website:"https://firefly.adobe.com",
+    pros:["Commercially safe training","Native Photoshop & Illustrator integration","Excellent Generative Fill","High-quality vectors"],
+    cons:["Requires Adobe CC subscription","Less flexible than open alternatives","Slower feature cadence"],
+    breakdown:{Accuracy:4.5,Usability:4.6,Speed:4.3,Value:4.0}
+  },
+  {
+    id:10, name:"Flux", emoji:"✨", category:"Image Generation",
+    tags:["Image Generation"], badge:"new",
+    shortDesc:"Black Forest Labs' next-gen model — photorealistic output with superior text rendering and prompt accuracy.",
+    longDesc:"Flux is a family of image generation models by Black Forest Labs, founded by the original Stable Diffusion creators. Flux.1 Pro represents a major leap in photorealism, compositional accuracy, and text rendering. Available through Replicate, Fal, and various platforms.",
+    rating:4.8, reviews:31500, year:2024, popularity:280000, website:"https://blackforestlabs.ai",
+    pros:["State-of-the-art photorealism","Best-in-class text rendering","Strong prompt adherence","Dev version is open-weights"],
+    cons:["Premium pricing for Pro","Newer with fewer integrations","Consistency varies"],
+    breakdown:{Accuracy:4.9,Usability:4.6,Speed:4.3,Value:4.4}
+  },
+  {
+    id:11, name:"Runway ML", emoji:"🎬", category:"Video & Animation",
+    tags:["Video & Animation"], badge:"top",
+    shortDesc:"The leading AI video studio — cinematic text-to-video, image animation, and professional editing tools.",
+    longDesc:"Runway is the AI video platform used by professional filmmakers, VFX studios, and content creators. Gen-3 Alpha produces high-motion, cinematic video clips from text or image prompts. Beyond generation, Runway offers green-screen removal, motion tracking, inpainting, and a full post-production suite.",
+    rating:4.7, reviews:38400, year:2023, popularity:340000, website:"https://runway.ml",
+    pros:["Highest quality AI video","Full professional post-production suite","Used by major studios","Active development"],
+    cons:["Expensive credit system","Short clip durations","Queue times at peak"],
+    breakdown:{Accuracy:4.6,Usability:4.7,Speed:4.2,Value:4.1}
+  },
+  {
+    id:12, name:"Sora", emoji:"🎥", category:"Video & Animation",
+    tags:["Video & Animation"], badge:"new",
+    shortDesc:"OpenAI's text-to-video model generating photorealistic scenes up to 60 seconds with physical coherence.",
+    longDesc:"Sora is OpenAI's text-to-video model capable of generating photorealistic video up to 60 seconds long. It understands physical interactions, lighting, and camera motion at an unprecedented level. Currently available to ChatGPT Plus and Pro subscribers.",
+    rating:4.6, reviews:29700, year:2024, popularity:290000, website:"https://sora.com",
+    pros:["Up to 60-second videos","Exceptional physical world simulation","Consistent characters","OpenAI-grade quality"],
+    cons:["Limited access, expensive","No audio generation","Still maturing"],
+    breakdown:{Accuracy:4.5,Usability:4.4,Speed:3.9,Value:3.8}
+  },
+  {
+    id:13, name:"Pika", emoji:"⚡", category:"Video & Animation",
+    tags:["Video & Animation"], badge:null,
+    shortDesc:"Fast and accessible AI video — ideal for animating images and social media content creation.",
+    longDesc:"Pika is an AI video platform focused on speed and accessibility. It excels at animating still images, generating short clips from text prompts, and applying motion effects. Free tier and intuitive web interface make it the go-to starting point for creators new to AI video.",
+    rating:4.3, reviews:22100, year:2023, popularity:210000, website:"https://pika.art",
+    pros:["Very fast generation","Beginner-friendly UI","Free tier available","Great for social content"],
+    cons:["Lower ceiling than Runway","Short clip duration","Limited camera control"],
+    breakdown:{Accuracy:4.2,Usability:4.7,Speed:4.8,Value:4.5}
+  },
+  {
+    id:14, name:"Suno", emoji:"🎵", category:"Audio & Music",
+    tags:["Audio & Music"], badge:"popular",
+    shortDesc:"Create full songs — vocals, instruments, and lyrics — from a single text prompt in seconds.",
+    longDesc:"Suno creates complete, production-quality songs from text descriptions. Unlike tools that only produce instrumentals, Suno generates vocals, lyrics, and full musical arrangements across virtually any genre. V4 introduced significantly improved vocal quality and longer songs.",
+    rating:4.8, reviews:54300, year:2023, popularity:480000, website:"https://suno.ai",
+    pros:["Full songs with realistic vocals","50+ genres and styles","Incredibly fast","Generous free tier"],
+    cons:["Copyright and licensing questions","Limited manual lyric control","No stems export"],
+    breakdown:{Accuracy:4.7,Usability:4.9,Speed:4.8,Value:4.6}
+  },
+  {
+    id:15, name:"ElevenLabs", emoji:"🔊", category:"Audio & Music",
+    tags:["Audio & Music","Productivity"], badge:"top",
+    shortDesc:"The most realistic AI voice synthesis — clone any voice in seconds, 29 languages, professional audio.",
+    longDesc:"ElevenLabs produces the most natural-sounding AI voices available. Instant voice cloning can replicate any voice from just seconds of audio. Features include text-to-speech, speech-to-speech, audiobook production, and real-time dubbing into 29 languages.",
+    rating:4.9, reviews:76800, year:2022, popularity:620000, website:"https://elevenlabs.io",
+    pros:["Most realistic AI voices","Voice cloning in under a minute","29 language dubbing","Comprehensive API"],
+    cons:["Expensive at scale","Misuse potential","Consent verification required"],
+    breakdown:{Accuracy:4.9,Usability:4.8,Speed:4.7,Value:4.3}
+  },
+  {
+    id:16, name:"Udio", emoji:"🎶", category:"Audio & Music",
+    tags:["Audio & Music"], badge:null,
+    shortDesc:"High-fidelity AI music with exceptional sound quality, detailed genre control, and genre-blending.",
+    longDesc:"Udio is an AI music platform known for exceptionally high audio fidelity and detailed musical control. It allows fine-grained control over style, instrumentation, tempo, and mood. Udio's strength lies in jazz, classical, and complex genre fusions.",
+    rating:4.6, reviews:18900, year:2024, popularity:180000, website:"https://udio.com",
+    pros:["Exceptional audio fidelity","Detailed instrument control","Seamless genre blending","Consistent improvements"],
+    cons:["Smaller community than Suno","Inconsistent on complex prompts","Limited free credits"],
+    breakdown:{Accuracy:4.5,Usability:4.5,Speed:4.4,Value:4.4}
+  },
+  {
+    id:17, name:"Cursor", emoji:"⌨️", category:"Coding Assistants",
+    tags:["Coding Assistants","Productivity"], badge:"top",
+    shortDesc:"AI-first code editor — full codebase understanding, multi-file edits, and autonomous agent mode.",
+    longDesc:"Cursor is an AI-first code editor built on VS Code. It uses Claude and GPT-4 to understand your entire codebase, not just the current file. Composer enables multi-file edits from a single prompt, while Agent mode can autonomously build features end-to-end.",
+    rating:4.9, reviews:62400, year:2023, popularity:580000, website:"https://cursor.sh",
+    pros:["Full codebase context","Multi-file simultaneous edits","Autonomous agent mode","VS Code compatibility"],
+    cons:["Subscription for top models","Code uploaded to cloud","Can make sweeping unintended changes"],
+    breakdown:{Accuracy:4.8,Usability:4.9,Speed:4.7,Value:4.6}
+  },
+  {
+    id:18, name:"GitHub Copilot", emoji:"🐙", category:"Coding Assistants",
+    tags:["Coding Assistants"], badge:"popular",
+    shortDesc:"GitHub's AI pair programmer — autocomplete, chat, CLI, and PR summaries across all major IDEs.",
+    longDesc:"GitHub Copilot is the original AI coding assistant by Microsoft and GitHub. It integrates into VS Code, JetBrains, Neovim, and Visual Studio with best-in-class IDE integration. Copilot Chat, CLI, and Workspace can plan and execute tasks across entire repositories.",
+    rating:4.7, reviews:98600, year:2021, popularity:810000, website:"https://github.com/features/copilot",
+    pros:["Deepest IDE integration","GitHub ecosystem native","CLI support","PR description generation"],
+    cons:["Monthly subscription cost","Context window limitations","Not the strongest raw AI"],
+    breakdown:{Accuracy:4.6,Usability:4.8,Speed:4.8,Value:4.4}
+  },
+  {
+    id:19, name:"Tabnine", emoji:"🔵", category:"Coding Assistants",
+    tags:["Coding Assistants"], badge:null,
+    shortDesc:"Privacy-first AI coding with a fully local model — enterprise-grade security and team code learning.",
+    longDesc:"Tabnine prioritises privacy and security above all else. Its unique value is a fully local AI model that runs entirely on your infrastructure. Enterprise teams can fine-tune Tabnine on their codebase for personalised suggestions.",
+    rating:4.3, reviews:43200, year:2019, popularity:310000, website:"https://tabnine.com",
+    pros:["Fully local AI model","Enterprise security & compliance","Learns from your codebase","Air-gapped deployment"],
+    cons:["Less capable than Cursor/Copilot","Smaller context window","Higher enterprise pricing"],
+    breakdown:{Accuracy:4.2,Usability:4.4,Speed:4.6,Value:4.2}
+  },
+  {
+    id:20, name:"Notion AI", emoji:"📝", category:"Productivity",
+    tags:["Productivity","Data & Analytics"], badge:null,
+    shortDesc:"AI writing, summarising, and Q&A across your entire Notion workspace — powered by Claude and GPT-4.",
+    longDesc:"Notion AI brings AI capabilities natively into your workspace. Write, summarise, translate, brainstorm, and extract action items without leaving your notes. The Q&A feature searches your entire workspace to find answers.",
+    rating:4.5, reviews:67800, year:2023, popularity:540000, website:"https://notion.so/ai",
+    pros:["Native workspace integration","Q&A across all notes","Multiple AI tasks","Real-time collaboration"],
+    cons:["Extra cost on top of Notion","Limited to Notion ecosystem","Occasionally slow"],
+    breakdown:{Accuracy:4.4,Usability:4.7,Speed:4.3,Value:4.2}
+  },
+  {
+    id:21, name:"Otter.ai", emoji:"🦦", category:"Productivity",
+    tags:["Productivity"], badge:null,
+    shortDesc:"AI meeting assistant that joins calls, transcribes in real-time, and surfaces action items automatically.",
+    longDesc:"Otter.ai automatically joins your Zoom, Teams, and Google Meet calls via OtterPilot. It transcribes in real time, generates summaries, identifies action items, and syncs with your calendar and CRM.",
+    rating:4.4, reviews:52100, year:2018, popularity:420000, website:"https://otter.ai",
+    pros:["Automatic meeting bot joining","Real-time transcription","Action item extraction","Calendar integration"],
+    cons:["Transcription errors on accents","Privacy implications","Limited free tier"],
+    breakdown:{Accuracy:4.3,Usability:4.6,Speed:4.7,Value:4.3}
+  },
+  {
+    id:22, name:"Julius AI", emoji:"📊", category:"Data & Analytics",
+    tags:["Data & Analytics","Research & Science"], badge:"new",
+    shortDesc:"Conversational AI data analyst — connect your datasets and get charts, statistics, and insights instantly.",
+    longDesc:"Julius AI lets you analyse data in plain English. Connect CSV files, Excel sheets, databases, or Google Sheets, then ask questions. Julius runs invisible Python and R code to produce professional charts, statistical analyses, and written insights.",
+    rating:4.6, reviews:21400, year:2023, popularity:190000, website:"https://julius.ai",
+    pros:["Natural language data analysis","Auto-generates professional charts","Runs Python/R invisibly","Multiple data sources"],
+    cons:["Complex analyses occasionally fail","Limited free tier","Less control for expert analysts"],
+    breakdown:{Accuracy:4.5,Usability:4.8,Speed:4.4,Value:4.5}
+  },
+  {
+    id:23, name:"Consensus", emoji:"🔬", category:"Research & Science",
+    tags:["Research & Science"], badge:null,
+    shortDesc:"AI search over 200M+ scientific papers — synthesised, cited answers with a research consensus meter.",
+    longDesc:"Consensus searches and synthesises over 200 million scientific papers. Ask a research question and get a synthesised, evidence-based answer with real citations and a consensus meter showing the weight of scientific opinion.",
+    rating:4.6, reviews:16700, year:2023, popularity:150000, website:"https://consensus.app",
+    pros:["200M+ peer-reviewed papers","Evidence-based answers","Real (not hallucinated) citations","Consensus meter"],
+    cons:["Limited to published research","Slower on complex queries","Premium for full access"],
+    breakdown:{Accuracy:4.7,Usability:4.5,Speed:4.2,Value:4.4}
+  },
+  {
+    id:24, name:"Spline AI", emoji:"🎯", category:"3D & Design",
+    tags:["3D & Design"], badge:"new",
+    shortDesc:"Browser-based 3D design with AI generation — create interactive 3D scenes from text, no experience needed.",
+    longDesc:"Spline is a browser-based 3D design tool with built-in AI generation. Describe a 3D object or scene and Spline AI generates it. The platform supports physics, animation, real-time collaboration, and easy website embedding.",
+    rating:4.5, reviews:18300, year:2023, popularity:165000, website:"https://spline.design",
+    pros:["Runs fully in browser","AI 3D generation","Real-time team collaboration","Easy website embedding"],
+    cons:["Limited vs. professional tools","Performance on complex scenes","AI generation still maturing"],
+    breakdown:{Accuracy:4.3,Usability:4.7,Speed:4.4,Value:4.6}
+  },
+  {
+    id:25, name:"Meta Llama", emoji:"🦙", category:"Chatbots & LLMs",
+    tags:["Chatbots & LLMs"], badge:"free",
+    shortDesc:"Meta's open-source LLM family — run locally, fine-tune freely, or deploy on any cloud infrastructure.",
+    longDesc:"Llama is Meta's family of open-source large language models, available in 8B to 405B parameter sizes. Llama 3 powers thousands of downstream applications, fine-tuned models, and research projects. Run it locally via Ollama, deploy on your own servers, or access through cloud providers — all without usage fees or vendor lock-in.",
+    rating:4.5, reviews:74200, year:2023, popularity:650000, website:"https://llama.meta.com",
+    pros:["Completely open-source & free","Local deployment on consumer hardware","Massive ecosystem of fine-tunes","No API costs or rate limits"],
+    cons:["Requires technical setup","Quality below frontier closed models","Large models need significant hardware"],
+    breakdown:{Accuracy:4.3,Usability:3.9,Speed:4.7,Value:5.0}
+  },
+  {
+    id:26, name:"Microsoft Copilot", emoji:"🪟", category:"Chatbots & LLMs",
+    tags:["Chatbots & LLMs","Productivity"], badge:"popular",
+    shortDesc:"Microsoft's AI companion powered by GPT-4 — integrated across Windows, Edge, Bing, and Office 365.",
+    longDesc:"Microsoft Copilot (formerly Bing Chat) is powered by GPT-4 and integrated deeply into Windows 11, Microsoft Edge, and the Office 365 suite. It can search the web in real time, generate images with DALL·E, assist with tasks across Word, Excel, and Outlook, and run as a sidebar in Edge. Free to use with a Microsoft account.",
+    rating:4.5, reviews:88200, year:2023, popularity:720000, website:"https://copilot.microsoft.com",
+    pros:["Free with any Microsoft account","Deep Windows & Office integration","Real-time web search","DALL·E image generation"],
+    cons:["Inconsistent response quality","Less capable than paid alternatives","Overly cautious filters"],
+    breakdown:{Accuracy:4.4,Usability:4.6,Speed:4.4,Value:4.8}
+  },
+  {
+    id:27, name:"Character.AI", emoji:"🎭", category:"Chatbots & LLMs",
+    tags:["Chatbots & LLMs"], badge:"popular",
+    shortDesc:"Chat with AI characters — celebrities, fictional personas, and custom bots created by the community.",
+    longDesc:"Character.AI is a platform where users can create and chat with AI personas modeled after real people, fictional characters, and original creations. With over 20 million daily active users, it's one of the most popular AI applications globally. Users can build their own characters with distinct personalities, backstories, and conversation styles.",
+    rating:4.4, reviews:96000, year:2022, popularity:870000, website:"https://character.ai",
+    pros:["Massive community character library","Highly engaging conversations","Easy character creation","Free tier available"],
+    cons:["Not suited for serious tasks","Content filters can be limiting","Accuracy not a priority"],
+    breakdown:{Accuracy:3.8,Usability:4.8,Speed:4.5,Value:4.6}
+  },
+  {
+    id:28, name:"DeepSeek", emoji:"🐋", category:"Chatbots & LLMs",
+    tags:["Chatbots & LLMs","Coding Assistants"], badge:"new",
+    shortDesc:"China's breakthrough open-source LLM — frontier reasoning performance at a fraction of competitors' cost.",
+    longDesc:"DeepSeek stunned the AI industry with models that match GPT-4 performance at dramatically lower training costs. DeepSeek-V3 and R1 offer strong reasoning, coding, and math capabilities with an open-source license. The R1 model uses reinforcement learning to achieve step-by-step chain-of-thought reasoning comparable to OpenAI o1.",
+    rating:4.7, reviews:41000, year:2024, popularity:380000, website:"https://chat.deepseek.com",
+    pros:["Frontier-level reasoning performance","Open-source models available","Exceptional math & coding ability","Very cost-effective API pricing"],
+    cons:["Chinese data residency concerns","Occasional censorship on sensitive topics","Smaller Western ecosystem"],
+    breakdown:{Accuracy:4.7,Usability:4.5,Speed:4.6,Value:4.9}
+  },
+  {
+    id:29, name:"Mistral AI", emoji:"🌬️", category:"Chatbots & LLMs",
+    tags:["Chatbots & LLMs","Coding Assistants"], badge:null,
+    shortDesc:"Europe's leading LLM lab — efficient open-source models and a strong API with excellent coding performance.",
+    longDesc:"Mistral AI is a French AI startup producing highly efficient language models. Mistral 7B punched far above its weight when released, and Mixtral 8x7B brought mixture-of-experts architecture to the open-source world. Le Chat is their consumer interface; the API serves enterprise developers needing European data sovereignty and deployment flexibility.",
+    rating:4.5, reviews:34500, year:2023, popularity:310000, website:"https://mistral.ai",
+    pros:["Highly efficient model architecture","Strong open-source commitment","European data sovereignty","Excellent coding performance"],
+    cons:["Less polished consumer product","Smaller than OpenAI/Anthropic","Fewer multimodal features"],
+    breakdown:{Accuracy:4.5,Usability:4.3,Speed:4.8,Value:4.7}
+  },
+  {
+    id:30, name:"Pi", emoji:"🧠", category:"Chatbots & LLMs",
+    tags:["Chatbots & LLMs"], badge:null,
+    shortDesc:"Inflection AI's personal AI companion — empathetic, warm, and designed for meaningful conversations.",
+    longDesc:"Pi is a personal AI assistant by Inflection AI designed for supportive, empathetic conversations. Unlike productivity-focused assistants, Pi prioritizes emotional intelligence and genuine connection. It remembers your conversations, checks in on you, and adapts to be a supportive companion rather than just an information retrieval tool.",
+    rating:4.3, reviews:19800, year:2023, popularity:180000, website:"https://pi.ai",
+    pros:["Exceptionally warm and empathetic","Strong conversation memory","Supportive and non-judgmental","Available on voice and text"],
+    cons:["Not suited for complex tasks","Limited factual accuracy","Niche conversational use case"],
+    breakdown:{Accuracy:4.0,Usability:4.7,Speed:4.5,Value:4.4}
+  },
+  {
+    id:31, name:"Poe", emoji:"🦋", category:"Chatbots & LLMs",
+    tags:["Chatbots & LLMs"], badge:null,
+    shortDesc:"Quora's AI platform — access ChatGPT, Claude, Gemini, Llama, and 100+ models under one subscription.",
+    longDesc:"Poe by Quora is an AI aggregator providing access to dozens of AI models including GPT-4o, Claude 3.5, Gemini, and Llama through a single subscription. Users can also create and share custom bots with specific instructions. Its broad model library makes it excellent value for power users who want to compare AI outputs side-by-side.",
+    rating:4.4, reviews:27300, year:2023, popularity:220000, website:"https://poe.com",
+    pros:["Access to 100+ AI models","Single subscription for everything","Custom bot creation and sharing","Great for comparing model outputs"],
+    cons:["Per-model message limits","Not the best individual UI","Entirely dependent on other AI providers"],
+    breakdown:{Accuracy:4.3,Usability:4.5,Speed:4.4,Value:4.7}
+  },
+  {
+    id:32, name:"Cohere Command R+", emoji:"🔷", category:"Chatbots & LLMs",
+    tags:["Chatbots & LLMs","Data & Analytics"], badge:null,
+    shortDesc:"Enterprise LLM optimized for RAG, document search, and business intelligence at scale.",
+    longDesc:"Cohere's Command R+ is built specifically for enterprise use cases — particularly retrieval-augmented generation (RAG), document analysis, and business intelligence. It features a 128K context window, tool use, and multilingual support for 10 languages, with flexible deployment on private cloud or on-premises infrastructure.",
+    rating:4.3, reviews:14200, year:2024, popularity:95000, website:"https://cohere.com",
+    pros:["Built specifically for enterprise RAG","On-premises deployment option","Strong multilingual support","Grounded, low-hallucination answers"],
+    cons:["Less consumer-facing than competitors","Higher enterprise pricing","Smaller developer community"],
+    breakdown:{Accuracy:4.4,Usability:4.2,Speed:4.3,Value:4.2}
+  },
+
+  /* ── IMAGE GENERATION ────────────────────────────────── */
+  {
+    id:33, name:"Ideogram", emoji:"💡", category:"Image Generation",
+    tags:["Image Generation"], badge:"new",
+    shortDesc:"AI image generation with best-in-class text rendering — create images with perfect, legible typography.",
+    longDesc:"Ideogram is an AI image generation tool that stands out for its exceptional ability to render text accurately within images — historically a weak area for AI models. V2 significantly improved overall image quality while maintaining its text rendering advantage. Ideal for posters, logos, banners, and marketing materials where readable text matters.",
+    rating:4.7, reviews:28400, year:2023, popularity:195000, website:"https://ideogram.ai",
+    pros:["Best text rendering of any image model","High overall image quality","Free tier available","Excellent for graphic design tasks"],
+    cons:["Smaller user base than Midjourney","Fewer style controls","Less photorealism ceiling"],
+    breakdown:{Accuracy:4.8,Usability:4.7,Speed:4.5,Value:4.8}
+  },
+  {
+    id:34, name:"Leonardo AI", emoji:"🦁", category:"Image Generation",
+    tags:["Image Generation","3D & Design"], badge:"popular",
+    shortDesc:"AI image platform with fine-tuned models, canvas editing, and a massive creator community.",
+    longDesc:"Leonardo AI offers a comprehensive image creation suite with custom-trained models, image-to-image generation, an AI canvas editor, and motion generation. Its creator community shares fine-tuned models specializing in game assets, concept art, portraits, and anime — making it one of the most versatile image platforms available.",
+    rating:4.6, reviews:52100, year:2023, popularity:340000, website:"https://leonardo.ai",
+    pros:["Large library of community fine-tuned models","AI Canvas editing tool","Motion and video generation","Generous free daily credits"],
+    cons:["Can be overwhelming for beginners","Quality varies significantly by model","Interface feels cluttered"],
+    breakdown:{Accuracy:4.5,Usability:4.4,Speed:4.5,Value:4.7}
+  },
+  {
+    id:35, name:"Playground AI", emoji:"🛝", category:"Image Generation",
+    tags:["Image Generation"], badge:null,
+    shortDesc:"Versatile AI image editor combining multiple models with a powerful canvas for creative compositing.",
+    longDesc:"Playground AI combines Stable Diffusion, DALL·E 3, and its own models in a single web interface with a canvas editor that allows mixing real photos with AI-generated content. Ideal for compositing workflows and users who want to experiment with multiple models without switching platforms.",
+    rating:4.3, reviews:21700, year:2022, popularity:165000, website:"https://playground.com",
+    pros:["Multiple AI models in one platform","Canvas editing and compositing","Generous free tier","Beginner friendly"],
+    cons:["Less distinctive output than Midjourney","Quality below top dedicated tools","Limited advanced controls"],
+    breakdown:{Accuracy:4.2,Usability:4.6,Speed:4.4,Value:4.7}
+  },
+  {
+    id:36, name:"Krea AI", emoji:"🎆", category:"Image Generation",
+    tags:["Image Generation","3D & Design"], badge:"new",
+    shortDesc:"Real-time AI canvas — see your image update live as you draw and type, enabling instant visual exploration.",
+    longDesc:"Krea AI offers a unique real-time image generation experience where the model continuously renders images as you draw on a canvas or refine your prompt. This live feedback loop makes it uniquely intuitive for visual ideation. Krea also offers an AI upscaler, image enhancer, and video generation tools.",
+    rating:4.5, reviews:16800, year:2023, popularity:140000, website:"https://krea.ai",
+    pros:["Real-time canvas generation","Instant live visual feedback","Great for rapid ideation","Upscaling and enhancement tools"],
+    cons:["Less precise than traditional prompting","Limited fine control","Newer, still growing platform"],
+    breakdown:{Accuracy:4.3,Usability:4.8,Speed:4.9,Value:4.6}
+  },
+  {
+    id:37, name:"Magnific AI", emoji:"🔬", category:"Image Generation",
+    tags:["Image Generation"], badge:null,
+    shortDesc:"AI upscaler that adds extraordinary detail — turn low-res images into stunning high-res artwork.",
+    longDesc:"Magnific AI goes far beyond traditional upscaling, intelligently adding new detail, texture, and structure to images while dramatically increasing resolution. Used by professional photographers, AI artists, and studios to enhance AI-generated images or restore old photographs with remarkable, often uncanny results.",
+    rating:4.6, reviews:18900, year:2024, popularity:130000, website:"https://magnific.ai",
+    pros:["Extraordinary detail hallucination","Works on any input image","Professional-grade output quality","Used by top AI artists worldwide"],
+    cons:["Expensive subscription pricing","Slow processing times","Can over-alter original composition"],
+    breakdown:{Accuracy:4.5,Usability:4.4,Speed:3.7,Value:4.0}
+  },
+  {
+    id:38, name:"Canva AI", emoji:"🖌️", category:"Image Generation",
+    tags:["Image Generation","Productivity","3D & Design"], badge:"popular",
+    shortDesc:"AI tools built into Canva — generate images, remove backgrounds, expand images, and write copy instantly.",
+    longDesc:"Canva integrates comprehensive AI features including Magic Media (text-to-image and text-to-video), Magic Expand (outpainting), Magic Erase, AI photo editing, and Magic Write for copywriting. For non-designers, Canva AI is the most accessible entry point into AI-generated visuals, requiring zero technical knowledge.",
+    rating:4.5, reviews:94300, year:2023, popularity:680000, website:"https://canva.com/ai-image-generator",
+    pros:["Seamlessly integrated with Canva templates","Accessible to complete non-designers","Multiple AI tools in one platform","Large library of starting templates"],
+    cons:["Not as powerful as dedicated image tools","Requires Canva Pro for best features","Generic output aesthetic"],
+    breakdown:{Accuracy:4.3,Usability:4.9,Speed:4.6,Value:4.5}
+  },
+
+  /* ── VIDEO & ANIMATION ───────────────────────────────── */
+  {
+    id:39, name:"Kling AI", emoji:"🎞️", category:"Video & Animation",
+    tags:["Video & Animation"], badge:"new",
+    shortDesc:"Kuaishou's powerful text-to-video generating high-quality 2-minute clips with strong motion consistency.",
+    longDesc:"Kling AI is a video generation model by Kuaishou (China's TikTok rival) that quickly gained recognition for generating high-quality video up to 2 minutes long. It demonstrates strong physical consistency, coherent character motion, and natural scene dynamics. Available internationally via its web interface and several API platforms.",
+    rating:4.6, reviews:22400, year:2024, popularity:210000, website:"https://klingai.com",
+    pros:["Up to 2-minute video generation","Strong motion consistency","Competitive quality at lower cost","Good character coherence"],
+    cons:["Interface primarily Chinese","Slower generation than some rivals","Access can be restricted internationally"],
+    breakdown:{Accuracy:4.5,Usability:4.3,Speed:4.0,Value:4.5}
+  },
+  {
+    id:40, name:"Luma Dream Machine", emoji:"🌙", category:"Video & Animation",
+    tags:["Video & Animation"], badge:"popular",
+    shortDesc:"Luma AI's fast text-to-video model with excellent cinematic camera movement and smooth motion.",
+    longDesc:"Luma Dream Machine is known for fast generation times, excellent camera motion control, and smooth subject movement. It excels at creating short-form cinematic clips and is widely used for social media content, visual effects prototyping, and creative exploration. The API enables developers to integrate video generation into products.",
+    rating:4.5, reviews:28700, year:2024, popularity:245000, website:"https://lumalabs.ai/dream-machine",
+    pros:["Fast video generation","Excellent cinematic camera movement","Clean web interface","Good developer API"],
+    cons:["Short clip duration limit","Less detailed than Runway Gen-3","Limited prompt customization"],
+    breakdown:{Accuracy:4.4,Usability:4.7,Speed:4.8,Value:4.6}
+  },
+  {
+    id:41, name:"HeyGen", emoji:"🤳", category:"Video & Animation",
+    tags:["Video & Animation","Productivity"], badge:"popular",
+    shortDesc:"AI avatar video creator — produce photorealistic talking-head videos in 175+ languages from any photo.",
+    longDesc:"HeyGen is the leading AI avatar video platform, enabling businesses to create professional talking-head videos without cameras or studios. Upload a photo or use a stock avatar, enter a script, and HeyGen generates a realistic video with accurate lip-sync in 175+ languages. Widely used for product demos, training content, and personalized outreach at scale.",
+    rating:4.7, reviews:38600, year:2023, popularity:320000, website:"https://heygen.com",
+    pros:["Photo-realistic avatar generation","175+ language support with lip-sync","No camera or studio required","Scalable personalized video"],
+    cons:["Deepfake misuse potential","Expensive for high-volume use","Occasional expression glitches"],
+    breakdown:{Accuracy:4.6,Usability:4.8,Speed:4.6,Value:4.4}
+  },
+  {
+    id:42, name:"Synthesia", emoji:"📹", category:"Video & Animation",
+    tags:["Video & Animation","Productivity"], badge:null,
+    shortDesc:"Enterprise AI video platform — create training and marketing videos with 200+ avatars, no camera needed.",
+    longDesc:"Synthesia is the leading enterprise AI video creation platform with 200+ diverse AI avatars, SCORM-compatible output for LMS platforms, and support for 140+ languages. Used by 50,000+ companies including BMW, Reuters, and Zoom for onboarding, training, and corporate communication videos.",
+    rating:4.5, reviews:29800, year:2017, popularity:260000, website:"https://synthesia.io",
+    pros:["Enterprise-grade reliability","200+ diverse AI avatars","SCORM support for LMS platforms","Strong brand integrations"],
+    cons:["Expensive enterprise pricing","Avatars can appear uncanny","Limited creative flexibility"],
+    breakdown:{Accuracy:4.4,Usability:4.7,Speed:4.5,Value:4.1}
+  },
+  {
+    id:43, name:"Descript", emoji:"✂️", category:"Video & Animation",
+    tags:["Video & Animation","Audio & Music","Productivity"], badge:null,
+    shortDesc:"Edit video and audio by editing the transcript — plus AI voice cloning, noise removal, and filler word removal.",
+    longDesc:"Descript revolutionized podcast and video editing by letting you edit media by editing a transcript. Cut words from the script and the audio/video is removed accordingly. Features include Overdub (AI voice clone for fixing recording mistakes), Studio Sound noise removal, automatic filler word and silence removal, and screen recording.",
+    rating:4.6, reviews:32400, year:2021, popularity:280000, website:"https://descript.com",
+    pros:["Edit video by editing text","AI voice clone for overdubbing","Auto filler word removal","Podcast and video in one tool"],
+    cons:["Learning curve for traditional video editors","Expensive for full feature set","Large file uploads can be slow"],
+    breakdown:{Accuracy:4.5,Usability:4.7,Speed:4.3,Value:4.4}
+  },
+  {
+    id:44, name:"InVideo AI", emoji:"📽️", category:"Video & Animation",
+    tags:["Video & Animation","Productivity"], badge:null,
+    shortDesc:"Turn text into professional videos in minutes — AI scripts, voiceovers, and stock footage automatically.",
+    longDesc:"InVideo AI converts text prompts or articles into polished marketing and social media videos by automatically writing scripts, selecting relevant stock footage, adding voiceovers, and generating subtitles. Popular for YouTube automation, faceless content channels, and marketing teams needing high video volume.",
+    rating:4.2, reviews:41200, year:2023, popularity:290000, website:"https://invideo.io/ai",
+    pros:["Fastest text-to-finished-video workflow","Large stock footage library","Automatic AI voiceover","Subtitle and caption generation"],
+    cons:["Generic stock footage aesthetic","Limited creative control","Output quality can be inconsistent"],
+    breakdown:{Accuracy:4.0,Usability:4.6,Speed:4.7,Value:4.4}
+  },
+
+  /* ── AUDIO & MUSIC ───────────────────────────────────── */
+  {
+    id:45, name:"Soundraw", emoji:"🎸", category:"Audio & Music",
+    tags:["Audio & Music"], badge:null,
+    shortDesc:"AI music generator for creators — royalty-free, customizable background tracks matched to your content's mood.",
+    longDesc:"Soundraw is an AI music generation platform focused on content creators needing royalty-free background music. Generate original tracks by selecting mood, genre, and tempo, then customize the energy, instrumentation, and structure. All generated music is fully royalty-free and licensed for commercial use on YouTube and social platforms.",
+    rating:4.4, reviews:18200, year:2021, popularity:165000, website:"https://soundraw.io",
+    pros:["Royalty-free commercial license","Mood and genre-based generation","Easy track customization","YouTube-safe usage"],
+    cons:["No vocal tracks","Less creative ceiling than Suno","Can sound repetitive"],
+    breakdown:{Accuracy:4.3,Usability:4.7,Speed:4.6,Value:4.5}
+  },
+  {
+    id:46, name:"AIVA", emoji:"🎼", category:"Audio & Music",
+    tags:["Audio & Music"], badge:null,
+    shortDesc:"AI classical composer — create orchestral scores, film soundtracks, and game music with emotional depth.",
+    longDesc:"AIVA (Artificial Intelligence Virtual Artist) specializes in creating full orchestral compositions, film scores, and video game soundtracks. Trained on classical music theory, it produces emotionally resonant pieces with complex arrangements. AIVA has been officially recognized as a composer by SACEM and is used by film and game studios.",
+    rating:4.4, reviews:14600, year:2016, popularity:120000, website:"https://aiva.ai",
+    pros:["Orchestral and classical specialization","Official SACEM composer recognition","MIDI export for DAW editing","Rich emotional depth"],
+    cons:["Expensive for commercial licensing","Not well-suited for modern pop/electronic","Less accessible interface"],
+    breakdown:{Accuracy:4.5,Usability:4.2,Speed:4.3,Value:4.1}
+  },
+  {
+    id:47, name:"Lalal.ai", emoji:"🎚️", category:"Audio & Music",
+    tags:["Audio & Music"], badge:null,
+    shortDesc:"AI stem splitter — separate vocals, drums, bass, and instruments from any song with professional accuracy.",
+    longDesc:"Lalal.ai uses deep learning to split any audio file into individual stems: vocals, drums, bass, piano, guitar, synths, and more. Used by DJs, producers, karaoke creators, and music educators to isolate components of existing songs. The neural network quality significantly exceeds traditional stem separation tools like Spleeter.",
+    rating:4.5, reviews:24300, year:2020, popularity:195000, website:"https://lalal.ai",
+    pros:["Best-quality AI stem separation","Separates 6+ individual tracks","Fast cloud processing","Simple drag-and-drop interface"],
+    cons:["Credits-based pricing adds up","Quality can dip on complex mixes","No music generation capability"],
+    breakdown:{Accuracy:4.6,Usability:4.7,Speed:4.5,Value:4.3}
+  },
+  {
+    id:48, name:"Play.ht", emoji:"📢", category:"Audio & Music",
+    tags:["Audio & Music","Productivity"], badge:null,
+    shortDesc:"AI voice generator with 900+ ultra-realistic voices across 142 languages — plus voice cloning and publishing.",
+    longDesc:"Play.ht offers over 900 ultra-realistic AI voices across 142 languages and accents. Features include real-time voice cloning, a developer API, WordPress plugin, and an audio player for publishing AI-narrated articles directly on websites. Used by podcasters, publishers, e-learning creators, and businesses for automated audio content production.",
+    rating:4.4, reviews:21800, year:2019, popularity:170000, website:"https://play.ht",
+    pros:["900+ realistic voices","142 language and accent support","WordPress integration","Audio publishing platform built-in"],
+    cons:["Less realistic than ElevenLabs","Complex multi-tier pricing","Interface can be occasionally buggy"],
+    breakdown:{Accuracy:4.3,Usability:4.4,Speed:4.6,Value:4.4}
+  },
+  {
+    id:49, name:"Adobe Podcast", emoji:"🎙️", category:"Audio & Music",
+    tags:["Audio & Music","Productivity"], badge:null,
+    shortDesc:"AI podcast tool with one-click studio-quality audio enhancement — remove noise, reverb, and room echo instantly.",
+    longDesc:"Adobe Podcast (part of Adobe Express) offers AI-powered audio enhancement that makes recordings sound like a professional studio — even if recorded on a phone in a noisy room. Speech Enhancement removes background noise and reverb, Mic Check analyzes your recording setup, and the transcript editor makes podcast editing intuitive. Free to use.",
+    rating:4.6, reviews:19400, year:2022, popularity:210000, website:"https://podcast.adobe.com",
+    pros:["One-click studio-quality enhancement","Removes background noise perfectly","Completely free to use","No audio experience required"],
+    cons:["Limited recording features","Requires Adobe account","Not a full DAW replacement"],
+    breakdown:{Accuracy:4.7,Usability:4.8,Speed:4.5,Value:4.9}
+  },
+
+  /* ── CODING ASSISTANTS ───────────────────────────────── */
+  {
+    id:50, name:"Windsurf", emoji:"🏄", category:"Coding Assistants",
+    tags:["Coding Assistants"], badge:"new",
+    shortDesc:"Codeium's agentic AI code editor with Cascade — deep codebase reasoning and autonomous multi-step coding.",
+    longDesc:"Windsurf by Codeium is an AI-first code editor featuring Cascade, an agentic AI that plans and executes multi-step coding tasks across your entire codebase. It understands context deeply, makes targeted multi-file edits, and can autonomously debug and refactor code. It's a strong direct competitor to Cursor with a generous free tier.",
+    rating:4.7, reviews:18600, year:2024, popularity:165000, website:"https://codeium.com/windsurf",
+    pros:["Cascade agentic coding system","Deep codebase understanding","Free tier available","Fast model response times"],
+    cons:["Newer with smaller community than Cursor","Still catching up on some advanced features","Occasional context window errors"],
+    breakdown:{Accuracy:4.6,Usability:4.7,Speed:4.8,Value:4.8}
+  },
+  {
+    id:51, name:"Replit AI", emoji:"🔄", category:"Coding Assistants",
+    tags:["Coding Assistants"], badge:null,
+    shortDesc:"AI-powered browser-based IDE — code, run, and deploy apps from any device with an AI pair programmer.",
+    longDesc:"Replit is a browser-based IDE with AI features including Ghostwriter (code completion and chat), AI debugging, and Replit Agent — which autonomously builds full applications from natural language descriptions. The collaborative environment, instant package installation, and one-click deployment make it ideal for learners and rapid prototypers.",
+    rating:4.4, reviews:48600, year:2023, popularity:380000, website:"https://replit.com/ai",
+    pros:["Runs entirely in browser — zero setup","Instant deployment","AI Agent for full app generation","Great for beginners and learners"],
+    cons:["Slower than local editors","Performance limits on free tier","Best suited for small-medium projects"],
+    breakdown:{Accuracy:4.3,Usability:4.7,Speed:4.2,Value:4.5}
+  },
+  {
+    id:52, name:"Amazon Q Developer", emoji:"☁️", category:"Coding Assistants",
+    tags:["Coding Assistants"], badge:null,
+    shortDesc:"AWS's AI coding assistant — code generation, debugging, and deep AWS infrastructure expertise.",
+    longDesc:"Amazon Q Developer (formerly CodeWhisperer) is Amazon's AI coding assistant with deep AWS integration. It generates code in 15+ languages, explains and debugs code, scans for security vulnerabilities, and provides context-aware suggestions for AWS APIs and cloud infrastructure. Essential for developers building in the AWS ecosystem.",
+    rating:4.3, reviews:31200, year:2023, popularity:255000, website:"https://aws.amazon.com/q/developer",
+    pros:["Deep AWS service and API knowledge","Security vulnerability scanning","Generous free tier","Strong Java and Python support"],
+    cons:["Best only within the AWS ecosystem","Less capable than Cursor for general coding","Less polished UI"],
+    breakdown:{Accuracy:4.3,Usability:4.4,Speed:4.5,Value:4.6}
+  },
+  {
+    id:53, name:"Devin", emoji:"🤖", category:"Coding Assistants",
+    tags:["Coding Assistants"], badge:"new",
+    shortDesc:"The first AI software engineer — autonomously plans, codes, tests, and deploys complete software projects.",
+    longDesc:"Devin by Cognition AI is the world's first fully autonomous AI software engineer. Given a task, Devin plans a solution, writes code across multiple files, runs tests, debugs errors, and deploys the application without human intervention. It can browse documentation, use a terminal, and manage its own development environment end-to-end.",
+    rating:4.2, reviews:8400, year:2024, popularity:85000, website:"https://cognition.ai",
+    pros:["Fully autonomous end-to-end engineering","Completes whole projects independently","Browses web for research and docs","Manages its own dev environment"],
+    cons:["Very expensive per task","Often slower than skilled developers","Not reliable for complex production systems"],
+    breakdown:{Accuracy:4.0,Usability:4.1,Speed:3.5,Value:3.6}
+  },
+  {
+    id:54, name:"Bolt.new", emoji:"⚡", category:"Coding Assistants",
+    tags:["Coding Assistants"], badge:"popular",
+    shortDesc:"StackBlitz's AI full-stack builder — describe your app and get a live, installable project in seconds.",
+    longDesc:"Bolt.new by StackBlitz uses WebContainers to run Node.js directly in the browser, generating complete runnable full-stack applications from natural language. It installs npm packages, runs servers, previews apps live, and deploys to Netlify — all without any local setup. Ideal for rapid prototyping and idea validation.",
+    rating:4.6, reviews:24800, year:2024, popularity:210000, website:"https://bolt.new",
+    pros:["Full-stack app in browser with no setup","Live preview as you build","Supports any npm package","One-click Netlify deployment"],
+    cons:["Complex apps hit context window limits","Browser performance constraints","Best for prototyping, not production"],
+    breakdown:{Accuracy:4.5,Usability:4.9,Speed:4.6,Value:4.7}
+  },
+  {
+    id:55, name:"v0 by Vercel", emoji:"▲", category:"Coding Assistants",
+    tags:["Coding Assistants","3D & Design"], badge:"new",
+    shortDesc:"Vercel's AI UI generator — describe interfaces in plain text and get production-ready React + Tailwind code.",
+    longDesc:"v0 by Vercel generates production-quality React components and full UI layouts from text descriptions. Using shadcn/ui and Tailwind CSS, it produces clean, accessible, and immediately deployable code. Tightly integrated with the Vercel platform for one-click deployment, and supports iterative refinement through natural language conversation.",
+    rating:4.7, reviews:21300, year:2023, popularity:185000, website:"https://v0.dev",
+    pros:["Production-ready React + Tailwind components","Uses modern shadcn/ui component library","One-click Vercel deployment","Natural language iterative refinement"],
+    cons:["React/Tailwind only — no other frameworks","Best for UI generation, not complex logic","Vercel ecosystem dependency"],
+    breakdown:{Accuracy:4.7,Usability:4.8,Speed:4.7,Value:4.6}
+  },
+  {
+    id:56, name:"Lovable", emoji:"💖", category:"Coding Assistants",
+    tags:["Coding Assistants"], badge:"new",
+    shortDesc:"AI full-stack engineer that builds complete web apps from prompts — with Supabase backend and live preview.",
+    longDesc:"Lovable (formerly GPT Engineer) is an AI development platform that generates complete web applications from conversational prompts. It integrates with Supabase for backend and database, GitHub for version control, and provides a live preview environment. Non-technical founders use it to build MVP products without writing a single line of code.",
+    rating:4.5, reviews:16200, year:2024, popularity:145000, website:"https://lovable.dev",
+    pros:["Full-stack app generation","Supabase database integration","GitHub sync for version control","Accessible to non-technical founders"],
+    cons:["Struggles with complex business logic","Subscription required for serious projects","Can generate buggy code on edge cases"],
+    breakdown:{Accuracy:4.4,Usability:4.7,Speed:4.5,Value:4.5}
+  },
+  {
+    id:57, name:"Aider", emoji:"🔧", category:"Coding Assistants",
+    tags:["Coding Assistants"], badge:"free",
+    shortDesc:"Open-source AI pair programmer for your terminal — edit code across multiple files using GPT-4 or Claude.",
+    longDesc:"Aider is an open-source command-line AI coding assistant that pairs with GPT-4, Claude, or local models to edit code in your existing git repositories. It understands your entire codebase, makes multi-file edits, commits changes with sensible messages, and integrates seamlessly into any development workflow without a special IDE.",
+    rating:4.5, reviews:12800, year:2023, popularity:95000, website:"https://aider.chat",
+    pros:["Completely open-source and free","Works with any IDE or text editor","Multi-file editing with git integration","Choice of AI provider (OpenAI, Anthropic, local)"],
+    cons:["Command-line only — no GUI","Requires API key and setup","Steeper learning curve"],
+    breakdown:{Accuracy:4.5,Usability:4.0,Speed:4.4,Value:5.0}
+  },
+
+  /* ── DATA & ANALYTICS ────────────────────────────────── */
+  {
+    id:58, name:"Tableau AI", emoji:"📈", category:"Data & Analytics",
+    tags:["Data & Analytics"], badge:null,
+    shortDesc:"Salesforce's Einstein AI in Tableau — natural language queries, predictive analytics, and smart visual insights.",
+    longDesc:"Tableau has integrated Salesforce's Einstein AI throughout its analytics platform. Einstein Discovery provides automated predictive and prescriptive analytics, Explain Data surfaces the why behind data points with AI, and Ask Data allows plain-English queries against any data source. Tableau AI dramatically lowers the data literacy barrier for business users.",
+    rating:4.4, reviews:28900, year:2023, popularity:240000, website:"https://tableau.com/ai",
+    pros:["Best-in-class visualization quality","Natural language querying","Predictive analytics built-in","Deep Salesforce CRM integration"],
+    cons:["Very expensive licensing","Steep learning curve","Requires existing Tableau investment"],
+    breakdown:{Accuracy:4.5,Usability:4.3,Speed:4.2,Value:3.8}
+  },
+  {
+    id:59, name:"Power BI Copilot", emoji:"💼", category:"Data & Analytics",
+    tags:["Data & Analytics","Productivity"], badge:"popular",
+    shortDesc:"Microsoft's AI assistant in Power BI — generate reports, write DAX formulas, and summarize dashboards in plain English.",
+    longDesc:"Microsoft Copilot in Power BI brings GPT-4 capabilities directly into analytics. Describe a report in natural language and Copilot generates it, write DAX formulas using plain-English descriptions, and get AI-generated narrative summaries of any dashboard. Included in Microsoft 365 E3/E5 licensing for enterprise teams.",
+    rating:4.4, reviews:34700, year:2023, popularity:310000, website:"https://powerbi.microsoft.com/copilot",
+    pros:["Report generation from natural language","DAX formula writing assistance","Included in Microsoft 365","Narrative dashboard summaries"],
+    cons:["Requires Microsoft 365 license","Works best in controlled environments","Occasionally inaccurate DAX output"],
+    breakdown:{Accuracy:4.3,Usability:4.5,Speed:4.4,Value:4.5}
+  },
+  {
+    id:60, name:"DataRobot", emoji:"🤖", category:"Data & Analytics",
+    tags:["Data & Analytics"], badge:null,
+    shortDesc:"Enterprise AutoML platform — automate the entire ML lifecycle from data preparation to production deployment.",
+    longDesc:"DataRobot is an enterprise AI platform that automates machine learning model development end-to-end. It automatically selects algorithms, trains and tunes models, generates explainability reports, and monitors production performance. Used by financial services, healthcare, and retail enterprises to deploy ML without deep data science expertise.",
+    rating:4.3, reviews:12400, year:2019, popularity:80000, website:"https://datarobot.com",
+    pros:["Automated end-to-end ML pipeline","Strong model explainability","Regulatory compliance features","No-code option for business analysts"],
+    cons:["Very expensive enterprise pricing","Overkill for small teams","Complex initial setup"],
+    breakdown:{Accuracy:4.5,Usability:4.2,Speed:4.1,Value:3.7}
+  },
+  {
+    id:61, name:"Polymer", emoji:"🧬", category:"Data & Analytics",
+    tags:["Data & Analytics"], badge:null,
+    shortDesc:"Turn any spreadsheet into an AI-powered interactive app with smart visualizations and natural language queries.",
+    longDesc:"Polymer transforms spreadsheets and CSVs into interactive, AI-powered web applications. It automatically detects data types, suggests visualizations, and enables natural language querying. Teams can share Polymer apps as shareable web experiences without writing code, making data exploration and reporting accessible to every stakeholder.",
+    rating:4.4, reviews:9800, year:2021, popularity:72000, website:"https://polymersearch.com",
+    pros:["Spreadsheet to web app in minutes","Automatic chart suggestions","Natural language data search","No-code dashboard creation"],
+    cons:["Limited for complex analytical queries","Smaller scale datasets","Less known than Tableau/Power BI"],
+    breakdown:{Accuracy:4.3,Usability:4.7,Speed:4.5,Value:4.6}
+  },
+  {
+    id:62, name:"Akkio", emoji:"📉", category:"Data & Analytics",
+    tags:["Data & Analytics"], badge:null,
+    shortDesc:"No-code AI analytics for agencies and business teams — build predictive models from CSV data in minutes.",
+    longDesc:"Akkio is a no-code AI analytics platform designed for marketing agencies and business teams without data science expertise. Connect data from HubSpot, Salesforce, or CSV, then use Chat Data Prep to clean it and build predictive models to forecast leads, churn, and revenue — without writing code.",
+    rating:4.3, reviews:7200, year:2019, popularity:52000, website:"https://akkio.com",
+    pros:["No-code predictive modeling","Chat-based data preparation","Agency and team templates","Salesforce and HubSpot integration"],
+    cons:["Limited to smaller datasets","Less accurate than DataRobot","Niche agency-focused positioning"],
+    breakdown:{Accuracy:4.2,Usability:4.6,Speed:4.4,Value:4.4}
+  },
+
+  /* ── PRODUCTIVITY ────────────────────────────────────── */
+  {
+    id:63, name:"Grammarly AI", emoji:"✍️", category:"Productivity",
+    tags:["Productivity"], badge:"popular",
+    shortDesc:"AI writing assistant that goes beyond grammar — improve tone, clarity, style, and generate text across every app.",
+    longDesc:"Grammarly has evolved from a grammar checker into a full AI writing assistant. GrammarlyGO generates text, rewrites sentences, adjusts tone, and provides contextual suggestions. The browser extension works across every web app — Gmail, Google Docs, LinkedIn, Twitter, and more. Over 30 million daily users make it the most widely used writing AI in the world.",
+    rating:4.6, reviews:124000, year:2023, popularity:890000, website:"https://grammarly.com/ai",
+    pros:["Works across all web apps seamlessly","Excellent grammar and style corrections","Tone adjustment and rewriting","30M+ daily active users"],
+    cons:["Premium required for best AI features","Can feel intrusive in text fields","Less powerful than Claude/GPT-4 for generation"],
+    breakdown:{Accuracy:4.7,Usability:4.8,Speed:4.8,Value:4.5}
+  },
+  {
+    id:64, name:"Jasper AI", emoji:"💎", category:"Productivity",
+    tags:["Productivity"], badge:null,
+    shortDesc:"AI content platform for enterprise marketing — brand voice, campaigns, and long-form content at scale.",
+    longDesc:"Jasper is an AI content platform built for enterprise marketing teams. It learns your brand voice and style guidelines, then generates on-brand blog posts, ad copy, email campaigns, and social media content consistently across your entire team. Integrates with Surfer SEO, Grammarly, and major marketing platforms.",
+    rating:4.3, reviews:42800, year:2021, popularity:320000, website:"https://jasper.ai",
+    pros:["Brand voice learning and enforcement","Marketing-specific content templates","SEO tool integrations","Team collaboration features"],
+    cons:["Expensive for small teams","Generic without extensive fine-tuning","Outpaced by ChatGPT for raw quality"],
+    breakdown:{Accuracy:4.3,Usability:4.5,Speed:4.5,Value:3.9}
+  },
+  {
+    id:65, name:"Copy.ai", emoji:"📋", category:"Productivity",
+    tags:["Productivity"], badge:null,
+    shortDesc:"AI content workflow automation — build marketing and sales pipelines from prospect research to published content.",
+    longDesc:"Copy.ai has evolved from a simple copywriting tool into an AI workflow automation platform. It enables marketing and sales teams to build end-to-end content pipelines that pull data from CRMs, generate personalized outreach, create blog content, and push to publishing platforms — all automatically without manual intervention.",
+    rating:4.3, reviews:38400, year:2020, popularity:275000, website:"https://copy.ai",
+    pros:["End-to-end marketing workflow automation","CRM integrations (Salesforce, HubSpot)","Good template library","Generous free tier"],
+    cons:["Raw quality below leading LLMs","Best for templated content types","Workflow setup can be complex initially"],
+    breakdown:{Accuracy:4.2,Usability:4.5,Speed:4.6,Value:4.4}
+  },
+  {
+    id:66, name:"Gamma", emoji:"🖥️", category:"Productivity",
+    tags:["Productivity","3D & Design"], badge:"popular",
+    shortDesc:"AI presentation builder — create beautiful slides, documents, and webpages from a text prompt in seconds.",
+    longDesc:"Gamma uses AI to generate visually stunning presentations, documents, and web pages from plain text prompts. Unlike traditional slide tools, Gamma produces modern, design-forward layouts that look professionally designed without any manual formatting. Supports real-time collaboration, viewer analytics, and sharing via link with no downloads required.",
+    rating:4.7, reviews:46200, year:2023, popularity:380000, website:"https://gamma.app",
+    pros:["Stunning AI-designed presentations","Creates documents and web pages too","Analytics on viewer engagement","Instant one-click theme changes"],
+    cons:["Limited slide-level customization","Less suitable for traditional corporate decks","Requires Gamma account for full features"],
+    breakdown:{Accuracy:4.5,Usability:4.9,Speed:4.8,Value:4.7}
+  },
+  {
+    id:67, name:"Tome", emoji:"📖", category:"Productivity",
+    tags:["Productivity"], badge:null,
+    shortDesc:"AI storytelling tool — narrative-driven presentations with AI-generated visuals and integrated text.",
+    longDesc:"Tome is an AI-native presentation tool focused on narrative storytelling rather than traditional slide grids. It generates entire presentation narratives from a prompt, automatically pairing text with relevant AI-generated images. Popular with investors, product teams, and creators for pitches and visual storytelling with a modern scrolling format.",
+    rating:4.3, reviews:21600, year:2022, popularity:185000, website:"https://tome.app",
+    pros:["Narrative-focused modern presentation style","AI images built into every slide","Great for pitch decks and storytelling","Unique immersive scrolling format"],
+    cons:["Less conventional — not for standard PowerPoint use","Limited data visualization","Niche scrolling format not universally accepted"],
+    breakdown:{Accuracy:4.2,Usability:4.6,Speed:4.5,Value:4.5}
+  },
+  {
+    id:68, name:"Reclaim.ai", emoji:"🗓️", category:"Productivity",
+    tags:["Productivity"], badge:null,
+    shortDesc:"AI calendar scheduling — automatically protect focus time, schedule habits, and intelligently manage meetings.",
+    longDesc:"Reclaim.ai intelligently manages your Google Calendar by automatically finding the best times for tasks, protecting focus work blocks, scheduling recurring habits, and handling meeting scheduling and buffers. It adapts in real time to calendar changes and reprioritizes automatically, saving hours of manual calendar management per week.",
+    rating:4.5, reviews:16800, year:2020, popularity:140000, website:"https://reclaim.ai",
+    pros:["Automatic focus time protection","Smart recurring habit scheduling","Intelligent meeting buffer management","Adapts to schedule changes in real time"],
+    cons:["Google Calendar only — no Outlook","Requires a learning and setup period","Advanced features behind paywall"],
+    breakdown:{Accuracy:4.4,Usability:4.6,Speed:4.7,Value:4.5}
+  },
+  {
+    id:69, name:"Mem AI", emoji:"🧠", category:"Productivity",
+    tags:["Productivity","Research & Science"], badge:null,
+    shortDesc:"Self-organizing AI notebook — automatically connects ideas, surfaces relevant notes, and drafts from your knowledge.",
+    longDesc:"Mem is an AI-powered note-taking app that organizes your notes automatically without manual tagging or folder structures. AI surfaces relevant memories in context, enables semantic search across everything you've written, and can draft content by synthesizing your existing notes. Designed to become smarter the more you use it.",
+    rating:4.3, reviews:12400, year:2021, popularity:95000, website:"https://mem.ai",
+    pros:["AI-powered automatic organization","Smart contextual content surfacing","Semantic search across all notes","No manual filing or tagging needed"],
+    cons:["Expensive subscription","Less mature than Notion","Occasional sync issues"],
+    breakdown:{Accuracy:4.2,Usability:4.4,Speed:4.3,Value:4.0}
+  },
+  {
+    id:70, name:"Superhuman AI", emoji:"🦸", category:"Productivity",
+    tags:["Productivity"], badge:null,
+    shortDesc:"The fastest email client with AI — auto-summarize threads, draft replies instantly, and reach inbox zero daily.",
+    longDesc:"Superhuman is a premium email client built for speed, now powered by AI. AI Triage automatically sorts your inbox by priority, AI Summary condenses long threads into 3 bullet points, and AI Reply drafts responses in your writing style. Used by executives, founders, and high-volume email users who can't afford to spend hours in email.",
+    rating:4.5, reviews:18600, year:2023, popularity:130000, website:"https://superhuman.com",
+    pros:["Fastest email experience available","AI thread summarization","Draft replies in your voice","Keyboard-first power user workflow"],
+    cons:["Very expensive ($30/month)","Only for Gmail and Outlook","Steep learning curve for shortcuts"],
+    breakdown:{Accuracy:4.4,Usability:4.6,Speed:4.9,Value:3.8}
+  },
+
+  /* ── RESEARCH & SCIENCE ──────────────────────────────── */
+  {
+    id:71, name:"Elicit", emoji:"🔭", category:"Research & Science",
+    tags:["Research & Science"], badge:null,
+    shortDesc:"AI research assistant automating literature reviews — find papers, extract data, and synthesize findings.",
+    longDesc:"Elicit automates tedious parts of research workflows by searching millions of academic papers, extracting key data points from study tables, and synthesizing findings into structured comparison tables. Particularly powerful for systematic literature reviews and evidence-based synthesis in medical, social science, and scientific fields.",
+    rating:4.5, reviews:14200, year:2021, popularity:105000, website:"https://elicit.com",
+    pros:["Automated literature review workflow","Structured data extraction from papers","Systematic evidence synthesis tables","Free for basic research use"],
+    cons:["Primarily English-language papers","Occasional extraction errors on complex tables","Slower than simple keyword search"],
+    breakdown:{Accuracy:4.5,Usability:4.5,Speed:4.2,Value:4.6}
+  },
+  {
+    id:72, name:"Scite.ai", emoji:"📎", category:"Research & Science",
+    tags:["Research & Science"], badge:null,
+    shortDesc:"Smart citation tool showing how papers are cited — distinguishing supporting, contrasting, and neutral references.",
+    longDesc:"Scite.ai analyzes how research papers have been cited in subsequent literature, categorizing each citation as supporting, contrasting, or simply mentioning the original work. This lets researchers instantly assess scientific consensus and reliability around any claim. Also includes an AI research assistant and retraction tracking.",
+    rating:4.4, reviews:9800, year:2019, popularity:78000, website:"https://scite.ai",
+    pros:["Citation context analysis (supporting vs contrasting)","AI research assistant","Retraction and correction tracking","Evidence quality assessment"],
+    cons:["Expensive full access","Smaller database than Google Scholar","Primarily STEM and biomedical focus"],
+    breakdown:{Accuracy:4.6,Usability:4.4,Speed:4.4,Value:4.1}
+  },
+  {
+    id:73, name:"Research Rabbit", emoji:"🐰", category:"Research & Science",
+    tags:["Research & Science"], badge:"free",
+    shortDesc:"Free AI paper discovery — visualize citation networks and find related research across any academic field.",
+    longDesc:"Research Rabbit is a free AI academic discovery tool that visualizes citation networks between papers. Start with one paper and Research Rabbit maps all related works — papers that cite it, papers it cites, and semantically similar research. Deep Zotero integration makes it seamlessly part of any academic reference management workflow.",
+    rating:4.6, reviews:11400, year:2021, popularity:95000, website:"https://researchrabbit.ai",
+    pros:["Completely free to use","Beautiful visual citation network maps","Zotero integration","Excellent for snowball literature discovery"],
+    cons:["No AI writing assistance","Limited to existing published papers","No full-text access or summarization"],
+    breakdown:{Accuracy:4.5,Usability:4.7,Speed:4.6,Value:5.0}
+  },
+  {
+    id:74, name:"Scholarcy", emoji:"📚", category:"Research & Science",
+    tags:["Research & Science"], badge:null,
+    shortDesc:"AI paper summarizer — extract key findings, methodology, limitations, and references from any academic paper.",
+    longDesc:"Scholarcy automatically summarizes academic papers, extracts key findings, methodology, limitations, and builds reference libraries. It generates structured flashcards from papers and allows researchers to quickly assess relevance without reading the full text. A browser extension enables one-click summarization from any publisher website.",
+    rating:4.3, reviews:8200, year:2018, popularity:62000, website:"https://scholarcy.com",
+    pros:["Fast structured paper summarization","Key finding and methodology extraction","Flashcard generation for studying","Browser extension for instant summaries"],
+    cons:["Summary quality varies by paper type","Limited free tier","Not suitable for all paper genres"],
+    breakdown:{Accuracy:4.2,Usability:4.4,Speed:4.6,Value:4.3}
+  },
+
+  /* ── 3D & DESIGN ─────────────────────────────────────── */
+  {
+    id:75, name:"Figma AI", emoji:"🎨", category:"3D & Design",
+    tags:["3D & Design","Productivity"], badge:"new",
+    shortDesc:"AI design features in Figma — generate UI layouts, auto-translate, remove backgrounds, and suggest components.",
+    longDesc:"Figma has integrated AI throughout its design platform. Make Designs generates full UI layouts from text descriptions, Auto-translate rewrites text layers in any language, and Remove Background processes images. AI also powers smart animation suggestions, auto-layout improvements, and component recommendations — all within the Figma workflow millions of designers already use.",
+    rating:4.5, reviews:38400, year:2024, popularity:380000, website:"https://figma.com/ai",
+    pros:["Native Figma integration — no workflow disruption","UI generation from text prompts","Automatic multilingual design translation","Accelerates professional design workflows"],
+    cons:["AI features still maturing","Requires Figma paid plan for full access","Less powerful than dedicated generation tools"],
+    breakdown:{Accuracy:4.4,Usability:4.7,Speed:4.5,Value:4.5}
+  },
+  {
+    id:76, name:"Uizard", emoji:"📱", category:"3D & Design",
+    tags:["3D & Design","Coding Assistants"], badge:null,
+    shortDesc:"AI UI design tool — convert sketches, screenshots, or text prompts into editable wireframes and mockups.",
+    longDesc:"Uizard converts hand-drawn sketches, screenshots, or text prompts into fully editable UI mockups in minutes. It generates multi-screen app and website designs from brief descriptions and includes pre-built design templates. Popular with product managers, startup founders, and non-designers who need to rapidly prototype and communicate product ideas.",
+    rating:4.3, reviews:14800, year:2020, popularity:115000, website:"https://uizard.io",
+    pros:["Sketch and screenshot to mockup conversion","Multi-screen app generation","No design skills required","Fast from idea to prototype"],
+    cons:["Output requires significant manual refinement","Not suitable for production-grade design","Limited component and icon library"],
+    breakdown:{Accuracy:4.1,Usability:4.6,Speed:4.5,Value:4.4}
+  },
+  {
+    id:77, name:"Meshy AI", emoji:"🎲", category:"3D & Design",
+    tags:["3D & Design"], badge:"new",
+    shortDesc:"Text and image to 3D model generator — create textured, game-ready 3D assets from prompts in minutes.",
+    longDesc:"Meshy is an AI 3D modeling tool that generates fully textured 3D models from text prompts or reference images. It outputs game-ready assets with UV maps and PBR textures in formats compatible with Unity, Unreal Engine, and Blender. Widely adopted by indie game developers, concept artists, and product designers for rapid 3D asset creation.",
+    rating:4.5, reviews:16200, year:2023, popularity:130000, website:"https://meshy.ai",
+    pros:["Text and image-to-3D generation","Game-ready output with UV and PBR textures","Unity/Unreal/Blender compatible formats","Fast generation with good detail"],
+    cons:["Quality varies on complex organic shapes","Manual cleanup often needed for production","Limited for character rigging and animation"],
+    breakdown:{Accuracy:4.3,Usability:4.6,Speed:4.4,Value:4.6}
+  },
+  {
+    id:78, name:"Looka", emoji:"🪞", category:"3D & Design",
+    tags:["3D & Design"], badge:null,
+    shortDesc:"AI logo and brand identity generator — professional logos, color palettes, and full brand kits in minutes.",
+    longDesc:"Looka is an AI-powered brand identity platform that generates professional logos, color palettes, font pairings, and complete brand kits from a few business inputs. Over 20 million logos have been created on the platform. Brand kits include social media templates, business card designs, email signatures, and brand guidelines documentation.",
+    rating:4.3, reviews:28600, year:2016, popularity:215000, website:"https://looka.com",
+    pros:["Professional logo generation","Full brand kit with social templates","20M+ logos created — proven platform","Easy to customize after generation"],
+    cons:["One-time purchase can be expensive","Output less unique than custom design","Limited advanced logo customization"],
+    breakdown:{Accuracy:4.2,Usability:4.7,Speed:4.8,Value:4.3}
+  }
+];
+
+const FEATURED_IDS = [1, 2, 6, 17, 54, 14]; // Editor's picks
+
+/* ────────────────────────────────────────────────────────
+   SUPABASE CONFIG
+   → Replace with your actual Supabase project URL + anon key
+──────────────────────────────────────────────────────── */
+const SUPABASE_URL  = 'https://vuagejkbzmmwgreogjnk.supabase.co';   // e.g. https://xxxx.supabase.co
+const SUPABASE_ANON = 'sb_publishable_PkAR-h-bmiAj-LblFa-4Bg_Hd1cUs53';
+
+let sbClient = null;   // renamed – avoids collision with window.supabase from CDN
+let allTools = null;   // null = not yet loaded; [] = loaded (empty); array = loaded tools
+
+try {
+  if (SUPABASE_URL !== 'YOUR_SUPABASE_URL') {
+    sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+  }
+} catch(e) { console.warn('Supabase init failed, using local data', e); }
+
+async function loadFromSupabase() {
+  console.log('[AIcontrast] loadFromSupabase() called. sbClient:', sbClient ? 'initialized' : 'null');
+  if (!sbClient) { allTools = null; render(); return; }
+  try {
+    showSkeleton();
+    console.log('[AIcontrast] Fetching tools from Supabase...');
+    const { data, error } = await sbClient
+      .from('tools')
+      .select('*')
+      .eq('approved', true)
+      .order('popularity', { ascending: false });
+    console.log('[AIcontrast] Supabase response — rows:', data?.length, '| error:', error);
+    if (error) throw error;
+    // Map DB columns → JS shape used by the app
+    if (!data || data.length === 0) {
+      console.warn('[AIcontrast] No approved tools returned — falling back to hardcoded data');
+      allTools = null; // fall back to hardcoded tools
+      return;
+    }
+    allTools = data.map(r => ({
+      id:         r.id,
+      name:       r.name,
+      emoji:      r.emoji,
+      category:   r.category,
+      tags:       r.tags || [],
+      badge:      r.badge,
+      shortDesc:  r.short_desc,
+      longDesc:   r.long_desc,
+      rating:     parseFloat(r.rating),
+      reviews:    r.reviews,
+      year:       r.year,
+      popularity: r.popularity,
+      website:    r.website,
+      pros:       r.pros || [],
+      cons:       r.cons || [],
+      breakdown:  r.breakdown || {},
+      domain:     r.domain,
+    }));
+    console.log('[AIcontrast] allTools populated with', allTools.length, 'tools. First:', allTools[0]?.name);
+    // Rebuild domain lookup from DB data
+    allTools.forEach(t => { if (t.domain) TOOL_LOGOS[t.id] = t.domain; });
+  } catch(e) {
+    console.error('[AIcontrast] Supabase fetch ERROR:', e);
+    allTools = null;
+  } finally {
+    hideSkeleton();
+    console.log('[AIcontrast] Calling render() — allTools length:', allTools?.length ?? 'null');
+    render();
+    renderFeatured();
+  }
+}
+
+function showSkeleton() {
+  const grid = document.getElementById('toolsGrid');
+  grid.style.display = 'grid';
+  grid.style.gridTemplateColumns = 'repeat(auto-fill,minmax(280px,1fr))';
+  grid.style.gap = '16px';
+  grid.innerHTML = Array(8).fill(0).map(()=>`
+    <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:20px;animation:pulse 1.4s ease-in-out infinite;">
+      <div style="display:flex;gap:14px;margin-bottom:14px;">
+        <div style="width:48px;height:48px;border-radius:13px;background:rgba(255,255,255,0.06);flex-shrink:0;"></div>
+        <div style="flex:1;">
+          <div style="height:14px;background:rgba(255,255,255,0.06);border-radius:6px;margin-bottom:8px;width:60%;"></div>
+          <div style="height:10px;background:rgba(255,255,255,0.04);border-radius:6px;width:40%;"></div>
+        </div>
+      </div>
+      <div style="height:10px;background:rgba(255,255,255,0.04);border-radius:6px;margin-bottom:6px;"></div>
+      <div style="height:10px;background:rgba(255,255,255,0.04);border-radius:6px;width:80%;margin-bottom:16px;"></div>
+      <div style="height:36px;background:rgba(255,255,255,0.04);border-radius:10px;"></div>
+    </div>
+  `).join('');
+}
+function hideSkeleton() {}
+
+/* ────────────────────────────────────────────────────────
+   STATE
+──────────────────────────────────────────────────────── */
+let state = { search:"", category:"All", sort:"popular", view:"grid" };
+
+/* ────────────────────────────────────────────────────────
+   COMPARISON STATE
+──────────────────────────────────────────────────────── */
+let compareList = []; // up to 3 tool ids
+
+function toggleCompare(id, e) {
+  e.stopPropagation();
+  const tools = allTools || TOOLS;
+  if (compareList.includes(id)) {
+    compareList = compareList.filter(x => x !== id);
+  } else {
+    if (compareList.length >= 3) {
+      showToast('You can compare up to 3 tools at a time');
+      return;
+    }
+    compareList.push(id);
+  }
+  renderCompareBar();
+  renderGrid(); // re-render to update button states
+}
+
+function renderCompareBar() {
+  const bar = document.getElementById('compareBar');
+  if (!bar) return;
+  const tools = allTools || TOOLS;
+  if (!compareList.length) { bar.style.display='none'; return; }
+  bar.style.display = 'flex';
+  const picks = compareList.map(id => tools.find(t=>t.id===id)).filter(Boolean);
+  bar.innerHTML = `
+    <div style="display:flex;align-items:center;gap:12px;flex:1;flex-wrap:wrap;">
+      <span style="font-size:12px;font-weight:600;color:#9ca3af;white-space:nowrap;">Compare (${picks.length}/3):</span>
+      ${picks.map(t=>`
+        <div style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:100px;padding:5px 12px 5px 8px;">
+          ${logoHTML(t,24)}
+          <span style="font-size:13px;font-weight:600;color:#f1f5f9;">${t.name}</span>
+          <button onclick="toggleCompare(${t.id},event)" style="width:16px;height:16px;border-radius:50%;background:rgba(255,255,255,0.1);border:none;color:#9ca3af;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px;padding:0;margin-left:2px;">✕</button>
+        </div>
+      `).join('')}
+    </div>
+    <div style="display:flex;gap:8px;flex-shrink:0;">
+      <button onclick="compareList=[];renderCompareBar();renderGrid();" style="padding:8px 16px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;font-size:12px;font-weight:500;color:#9ca3af;cursor:pointer;">Clear</button>
+      <button onclick="openCompareModal()" ${picks.length<2?'disabled':''} style="padding:8px 18px;background:linear-gradient(135deg,#6366f1,#7c3aed);border:none;border-radius:10px;font-size:12px;font-weight:600;color:white;cursor:pointer;opacity:${picks.length<2?'0.5':'1'};">Compare →</button>
+    </div>
+  `;
+}
+
+function openCompareModal() {
+  if (compareList.length < 2) return;
+  const tools = allTools || TOOLS;
+  const picks = compareList.map(id => tools.find(t=>t.id===id)).filter(Boolean);
+  const allKeys = ['rating','reviews','popularity','year'];
+  const allPros = picks.map(t=>(t.pros||[]).slice(0,4));
+  const allCons = picks.map(t=>(t.cons||[]).slice(0,3));
+
+  const colWidth = picks.length === 2 ? '1fr 1fr' : '1fr 1fr 1fr';
+
+  document.getElementById('compareModalContent').innerHTML = `
+    <div style="padding:28px 28px 20px;border-bottom:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:space-between;">
+      <h2 style="font-size:20px;font-weight:800;color:#f1f5f9;margin:0;">Side-by-Side Comparison</h2>
+      <button onclick="closeCompareModal()" style="width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:#9ca3af;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
+    </div>
+    <div style="overflow-y:auto;max-height:calc(90vh - 100px);padding:24px 28px;">
+
+      <!-- Tool headers -->
+      <div style="display:grid;grid-template-columns:160px ${colWidth};gap:16px;margin-bottom:24px;">
+        <div></div>
+        ${picks.map(t=>`
+          <div style="text-align:center;">
+            <div style="display:flex;justify-content:center;margin-bottom:10px;">${logoHTML(t,56)}</div>
+            <div style="font-size:16px;font-weight:700;color:#f1f5f9;">${t.name}</div>
+            <div style="font-size:11px;color:${CAT_COLOR[t.category]||'#6366f1'};font-weight:500;margin-top:2px;">${t.category}</div>
+            <div style="margin-top:8px;">${starHTML(t.rating,13)}</div>
+            <div style="font-size:18px;font-weight:800;color:#f1f5f9;margin-top:4px;">${t.rating}</div>
+          </div>
+        `).join('')}
+      </div>
+
+      <!-- Stats rows -->
+      ${[
+        ['Reviews', t=>fmt(t.reviews)],
+        ['Monthly Users', t=>fmt(t.popularity)+'+'],
+        ['Year Founded', t=>t.year],
+        ['Badge', t=>t.badge?t.badge.charAt(0).toUpperCase()+t.badge.slice(1):'—'],
+      ].map(([label, fn])=>`
+        <div style="display:grid;grid-template-columns:160px ${colWidth};gap:16px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
+          <div style="font-size:12px;font-weight:600;color:#4b5563;text-transform:uppercase;letter-spacing:0.05em;display:flex;align-items:center;">${label}</div>
+          ${picks.map(t=>`<div style="font-size:14px;font-weight:600;color:#f1f5f9;text-align:center;">${fn(t)}</div>`).join('')}
+        </div>
+      `).join('')}
+
+      <!-- Pros -->
+      <div style="display:grid;grid-template-columns:160px ${colWidth};gap:16px;padding:16px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
+        <div style="font-size:12px;font-weight:600;color:#4b5563;text-transform:uppercase;letter-spacing:0.05em;">Pros</div>
+        ${allPros.map(pros=>`
+          <ul style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;">
+            ${pros.map(p=>`<li style="font-size:12px;color:#6b7280;display:flex;align-items:flex-start;gap:6px;"><span style="color:#10b981;flex-shrink:0;margin-top:1px;">✓</span>${p}</li>`).join('')}
+          </ul>
+        `).join('')}
+      </div>
+
+      <!-- Cons -->
+      <div style="display:grid;grid-template-columns:160px ${colWidth};gap:16px;padding:16px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
+        <div style="font-size:12px;font-weight:600;color:#4b5563;text-transform:uppercase;letter-spacing:0.05em;">Cons</div>
+        ${allCons.map(cons=>`
+          <ul style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;">
+            ${cons.map(c=>`<li style="font-size:12px;color:#6b7280;display:flex;align-items:flex-start;gap:6px;"><span style="color:#ef4444;flex-shrink:0;margin-top:1px;">✗</span>${c}</li>`).join('')}
+          </ul>
+        `).join('')}
+      </div>
+
+      <!-- Visit buttons -->
+      <div style="display:grid;grid-template-columns:160px ${colWidth};gap:16px;padding:20px 0 4px;">
+        <div></div>
+        ${picks.map(t=>`
+          <a href="${t.website}" target="_blank" rel="noopener" class="btn-brand" style="text-align:center;padding:10px 14px;font-size:13px;text-decoration:none;border:none;display:block;">
+            Visit ${t.name} →
+          </a>
+        `).join('')}
+      </div>
+    </div>
+  `;
+  document.getElementById('compareModal').style.display='flex';
+}
+
+function closeCompareModal() {
+  document.getElementById('compareModal').style.display='none';
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  if (!t) return;
+  t.textContent = msg;
+  t.style.opacity = '1'; t.style.transform = 'translateY(0)';
+  setTimeout(()=>{ t.style.opacity='0'; t.style.transform='translateY(8px)'; }, 2500);
+}
+
+/* ────────────────────────────────────────────────────────
+   HELPERS
+──────────────────────────────────────────────────────── */
+function fmt(n) {
+  if (n>=1e6) return (n/1e6).toFixed(1)+'M';
+  if (n>=1e3) return (n>=10000 ? Math.round(n/1e3) : (n/1e3).toFixed(1))+'K';
+  return ''+n;
+}
+
+function starHTML(r, sz=14) {
+  let h='<span style="display:inline-flex;align-items:center;gap:2px;">';
+  const full='#f59e0b', empty='#1f2937';
+  for(let i=1;i<=5;i++){
+    const id='g'+Math.random().toString(36).slice(2);
+    const f=i<=Math.floor(r), half=!f&&i===Math.ceil(r)&&r%1>=0.25;
+    const col=f?full:(half?`url(#${id})`:empty);
+    h+=`<svg width="${sz}" height="${sz}" viewBox="0 0 20 20" fill="${col}" xmlns="http://www.w3.org/2000/svg">`;
+    if(half)h+=`<defs><linearGradient id="${id}"><stop offset="55%" stop-color="${full}"/><stop offset="55%" stop-color="${empty}"/></linearGradient></defs>`;
+    h+=`<path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>`;
+  }
+  return h+'</span>';
+}
+
+function badgeHTML(b) {
+  if(!b)return'';
+  const MAP={new:'badge-new',top:'badge-top',popular:'badge-popular',free:'badge-free'};
+  const LABEL={new:'New',top:'Top Rated',popular:'Popular',free:'Free'};
+  return `<span class="badge ${MAP[b]||''}">${LABEL[b]||b}</span>`;
+}
+
+function catDot(cat) {
+  const c=CAT_COLOR[cat]||'#6366f1';
+  return `<span class="cat-dot" style="background:${c};flex-shrink:0;display:inline-block;margin-right:2px;"></span>`;
+}
+
+/* ────────────────────────────────────────────────────────
+   FILTER
+──────────────────────────────────────────────────────── */
+function getFiltered() {
+  let list=[...(allTools&&allTools.length?allTools:TOOLS)];
+  if(state.category!=="All") list=list.filter(t=>t.tags.includes(state.category)||t.category===state.category);
+  if(state.search.trim()){
+    const q=state.search.toLowerCase();
+    list=list.filter(t=>
+      t.name.toLowerCase().includes(q)||
+      t.shortDesc.toLowerCase().includes(q)||
+      t.longDesc.toLowerCase().includes(q)||
+      t.tags.some(g=>g.toLowerCase().includes(q))||
+      t.category.toLowerCase().includes(q)
+    );
+  }
+  switch(state.sort){
+    case'rated':   list.sort((a,b)=>b.rating-a.rating);break;
+    case'popular': list.sort((a,b)=>b.popularity-a.popularity);break;
+    case'newest':  list.sort((a,b)=>b.year-a.year);break;
+    case'az':      list.sort((a,b)=>a.name.localeCompare(b.name));break;
+  }
+  return list;
+}
+
+/* ────────────────────────────────────────────────────────
+   RENDER: FEATURED STRIP
+──────────────────────────────────────────────────────── */
+function renderFeatured() {
+  const strip=document.getElementById('featuredStrip');
+  const picks=FEATURED_IDS.map(id=>(allTools&&allTools.length?allTools:TOOLS).find(t=>t.id===id)).filter(Boolean);
+  strip.innerHTML=picks.map(t=>`
+    <div class="feat-card" onclick="openModal(${t.id})" style="min-width:220px;max-width:240px;flex-shrink:0;padding:18px;">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+        ${logoHTML(t, 44)}
+        <div>
+          <div style="font-size:14px;font-weight:700;color:#f1f5f9;line-height:1.2;">${t.name}</div>
+          <div style="font-size:11px;color:${CAT_COLOR[t.category]||'#6366f1'};font-weight:500;margin-top:1px;">${t.category}</div>
+        </div>
+      </div>
+      <p style="font-size:11.5px;color:#6b7280;line-height:1.6;margin-bottom:12px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${t.shortDesc}</p>
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div style="display:flex;align-items:center;gap:5px;">
+          ${starHTML(t.rating,12)}
+          <span style="font-size:12px;font-weight:700;color:#f1f5f9;">${t.rating}</span>
+        </div>
+        ${badgeHTML(t.badge)}
+      </div>
+    </div>
+  `).join('');
+}
+
+/* ────────────────────────────────────────────────────────
+   RENDER: SIDEBAR
+──────────────────────────────────────────────────────── */
+function renderSidebar() {
+  const nav=document.getElementById('sidebarNav');
+  const chips=document.getElementById('mobileChips');
+  const counts={};
+  CATEGORIES.forEach(c=>{
+    const src=allTools&&allTools.length?allTools:TOOLS;
+    counts[c]=c==="All"?src.length:src.filter(t=>t.tags.includes(c)||t.category===c).length;
+  });
+  nav.innerHTML=CATEGORIES.map(cat=>`
+    <button onclick="setCategory('${cat}')" class="cat-btn${state.category===cat?' active':''}">
+      <span style="display:flex;align-items:center;gap:8px;">
+        ${cat!=='All'?`<span style="width:7px;height:7px;border-radius:50%;background:${CAT_COLOR[cat]||'#6366f1'};flex-shrink:0;display:inline-block;"></span>`:'<span style="font-size:13px;line-height:1;">🌐</span>'}
+        <span style="font-size:13px;">${cat}</span>
+      </span>
+      <span style="font-size:10px;font-weight:600;font-variant-numeric:tabular-nums;color:${state.category===cat?'#6366f1':'#374151'}">${counts[cat]}</span>
+    </button>
+  `).join('');
+
+  chips.innerHTML=CATEGORIES.map(cat=>`
+    <button onclick="setCategory('${cat}')" style="flex-shrink:0;display:flex;align-items:center;gap:5px;padding:6px 14px;border-radius:100px;font-size:11.5px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all 0.15s;
+      ${state.category===cat
+        ?'background:linear-gradient(135deg,#6366f1,#7c3aed);color:white;border:1px solid transparent;'
+        :'background:rgba(255,255,255,0.04);color:#6b7280;border:1px solid rgba(255,255,255,0.08);'}">
+      ${CAT_ICONS[cat]} ${cat}
+    </button>
+  `).join('');
+}
+
+/* ────────────────────────────────────────────────────────
+   RENDER: GRID
+──────────────────────────────────────────────────────── */
+function renderGrid() {
+  const list=getFiltered();
+  const grid=document.getElementById('toolsGrid');
+  const empty=document.getElementById('emptyState');
+  const title=document.getElementById('pageTitle');
+  const sub=document.getElementById('pageSubtitle');
+  const hdr=document.getElementById('hdrCount');
+
+  title.textContent=state.category==='All'?'All AI Tools':state.category;
+  sub.textContent=`${list.length} tool${list.length!==1?'s':''} found${state.search?' for "'+state.search+'"':''}`;
+  hdr.textContent=(allTools&&allTools.length?allTools:TOOLS).length+' tools indexed';
+
+  updateSortButtons();
+
+  if(!list.length){
+    grid.style.display='none'; empty.style.display='block'; return;
+  }
+  empty.style.display='none'; grid.style.display='';
+
+  if(state.view==='list'){
+    grid.style.display='flex'; grid.style.flexDirection='column'; grid.style.gap='10px';
+    grid.innerHTML=list.map(t=>`
+      <div class="list-card" onclick="openModal(${t.id})" style="padding:18px 20px;display:flex;align-items:center;gap:18px;">
+        ${logoHTML(t, 48)}
+        <div style="flex:1;min-width:0;">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:3px;">
+            <span style="font-size:15px;font-weight:700;color:#f1f5f9;">${t.name}</span>
+            ${badgeHTML(t.badge)}
+            <span style="font-size:11px;font-weight:500;color:${CAT_COLOR[t.category]||'#6366f1'};background:${CAT_COLOR[t.category]||'#6366f1'}18;padding:2px 8px;border-radius:100px;">${t.category}</span>
+          </div>
+          <p style="font-size:13px;color:#6b7280;line-height:1.5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:600px;">${t.shortDesc}</p>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0;">
+          <div style="display:flex;align-items:center;gap:5px;">${starHTML(t.rating,13)}<span style="font-size:13px;font-weight:700;color:#f1f5f9;">${t.rating}</span></div>
+          <span style="font-size:11px;color:#374151;">${fmt(t.reviews)} reviews</span>
+        </div>
+        <a href="${t.website}" target="_blank" rel="noopener" onclick="event.stopPropagation()" class="btn-brand" style="padding:8px 18px;font-size:12px;text-decoration:none;border:none;flex-shrink:0;display:block;">Visit →</a>
+      </div>
+    `).join('');
+  } else {
+    grid.style.display='grid';
+    grid.style.gridTemplateColumns='repeat(auto-fill,minmax(280px,1fr))';
+    grid.style.gap='16px';
+    grid.innerHTML=list.map(t=>`
+      <div class="ai-card" onclick="openModal(${t.id})" style="padding:20px;">
+
+        <!-- Card top accent line -->
+        <div style="position:absolute;top:0;left:20px;right:20px;height:2px;background:linear-gradient(90deg,${CAT_COLOR[t.category]||'#6366f1'},transparent);border-radius:0 0 4px 4px;opacity:0.6;pointer-events:none;"></div>
+
+        <!-- Header -->
+        <div style="display:flex;align-items:flex-start;gap:14px;margin-bottom:14px;">
+          ${logoHTML(t, 48)}
+          <div style="flex:1;min-width:0;padding-top:2px;">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:6px;">
+              <span style="font-size:15px;font-weight:700;color:#f1f5f9;line-height:1.2;">${t.name}</span>
+              ${badgeHTML(t.badge)}
+            </div>
+            <div style="display:flex;align-items:center;gap:5px;margin-top:3px;">
+              <span style="width:6px;height:6px;border-radius:50%;background:${CAT_COLOR[t.category]||'#6366f1'};display:inline-block;flex-shrink:0;"></span>
+              <span style="font-size:11px;font-weight:500;color:${CAT_COLOR[t.category]||'#6366f1'};">${t.category}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Desc -->
+        <p class="line-clamp-2" style="font-size:13px;color:#6b7280;line-height:1.65;margin-bottom:14px;">${t.shortDesc}</p>
+
+        <!-- Rating -->
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+          ${starHTML(t.rating)}
+          <span style="font-size:14px;font-weight:700;color:#f1f5f9;">${t.rating}</span>
+          <span style="font-size:11px;color:#374151;">(${fmt(t.reviews)})</span>
+          <span style="margin-left:auto;font-size:10px;font-weight:600;color:#374151;font-variant-numeric:tabular-nums;">${t.year}</span>
+        </div>
+
+        <!-- Tags -->
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;">
+          ${t.tags.slice(0,3).map(tag=>`
+            <span style="display:inline-flex;align-items:center;gap:4px;padding:3px 9px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:100px;font-size:10.5px;font-weight:500;color:#4b5563;">
+              <span style="width:5px;height:5px;border-radius:50%;background:${CAT_COLOR[tag]||'#6366f1'};display:inline-block;"></span>
+              ${tag}
+            </span>
+          `).join('')}
+        </div>
+
+        <!-- Divider -->
+        <div style="height:1px;background:rgba(255,255,255,0.05);margin-bottom:14px;"></div>
+
+        <!-- CTA row -->
+        <div style="display:flex;gap:8px;">
+          <a href="${t.website}" target="_blank" rel="noopener" onclick="event.stopPropagation()" class="btn-brand" style="flex:1;text-align:center;padding:9px 12px;font-size:12.5px;text-decoration:none;border:none;display:block;">
+            Visit →
+          </a>
+          <button onclick="event.stopPropagation();openModal(${t.id})" style="padding:9px 12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:10px;font-size:12px;font-weight:500;color:#9ca3af;cursor:pointer;transition:all 0.15s;white-space:nowrap;" onmouseover="this.style.background='rgba(255,255,255,0.09)';this.style.color='#e2e8f0'" onmouseout="this.style.background='rgba(255,255,255,0.05)';this.style.color='#9ca3af'">
+            Details
+          </button>
+          <button onclick="toggleCompare(${t.id},event)" title="${compareList.includes(t.id)?'Remove from compare':'Add to compare'}" style="padding:9px 11px;background:${compareList.includes(t.id)?'rgba(99,102,241,0.15)':'rgba(255,255,255,0.05)'};border:1px solid ${compareList.includes(t.id)?'rgba(99,102,241,0.4)':'rgba(255,255,255,0.08)'};border-radius:10px;font-size:13px;cursor:pointer;transition:all 0.15s;color:${compareList.includes(t.id)?'#818cf8':'#6b7280'};" onmouseover="this.style.background='rgba(99,102,241,0.12)';this.style.borderColor='rgba(99,102,241,0.3)'" onmouseout="this.style.background='${compareList.includes(t.id)?'rgba(99,102,241,0.15)':'rgba(255,255,255,0.05)'}';this.style.borderColor='${compareList.includes(t.id)?'rgba(99,102,241,0.4)':'rgba(255,255,255,0.08)'}'">
+            ${compareList.includes(t.id)?'✓':'⊕'}
+          </button>
+        </div>
+      </div>
+    `).join('');
+  }
+}
+
+/* ────────────────────────────────────────────────────────
+   RENDER: MODAL
+──────────────────────────────────────────────────────── */
+function openModal(id) {
+  const t=(allTools&&allTools.length?allTools:TOOLS).find(x=>x.id===id); if(!t)return;
+  document.getElementById('modalContent').innerHTML=`
+    <!-- Modal header with gradient -->
+    <div style="padding:28px 28px 20px;border-bottom:1px solid rgba(255,255,255,0.06);background:linear-gradient(135deg,rgba(99,102,241,0.06) 0%,rgba(139,92,246,0.04) 100%);">
+      <div style="display:flex;align-items:flex-start;gap:18px;">
+        ${logoHTML(t, 68)}
+        <div style="flex:1;min-width:0;">
+          <div style="display:flex;align-items:flex-start;flex-wrap:wrap;gap:8px;margin-bottom:6px;">
+            <h2 style="font-size:22px;font-weight:800;color:#f1f5f9;letter-spacing:-0.4px;margin:0;">${t.name}</h2>
+            ${badgeHTML(t.badge)}
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;">
+            <span style="display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:500;color:${CAT_COLOR[t.category]||'#6366f1'};background:${CAT_COLOR[t.category]||'#6366f1'}18;padding:3px 10px;border-radius:100px;">
+              ${CAT_ICONS[t.category]||''} ${t.category}
+            </span>
+            <span style="font-size:11px;color:#374151;font-weight:500;">· Est. ${t.year}</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            ${starHTML(t.rating,15)}
+            <span style="font-size:16px;font-weight:800;color:#f1f5f9;">${t.rating}</span>
+            <span style="font-size:12px;color:#4b5563;">${fmt(t.reviews)} reviews</span>
+            <span style="margin-left:8px;font-size:11px;color:#4b5563;">·</span>
+            <span style="font-size:11px;color:#4b5563;">${fmt(t.popularity)}+ users/mo</span>
+          </div>
+        </div>
+        <button onclick="closeModal()" style="color:#374151;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.07);border-radius:9px;padding:7px;cursor:pointer;transition:all 0.15s;flex-shrink:0;" onmouseover="this.style.background='rgba(255,255,255,0.1)';this.style.color='#e2e8f0'" onmouseout="this.style.background='rgba(255,255,255,0.05)';this.style.color='#374151'">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Modal body -->
+    <div style="padding:24px 28px;display:flex;flex-direction:column;gap:24px;">
+
+      <!-- About -->
+      <div>
+        <p style="font-size:10px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px;">About</p>
+        <p style="font-size:14px;color:#9ca3af;line-height:1.75;">${t.longDesc}</p>
+      </div>
+
+      <!-- Rating breakdown -->
+      <div>
+        <p style="font-size:10px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:12px;">Rating Breakdown</p>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          ${Object.entries(t.breakdown).map(([k,v])=>`
+            <div style="display:grid;grid-template-columns:90px 1fr 36px;align-items:center;gap:12px;">
+              <span style="font-size:12px;color:#4b5563;font-weight:500;">${k}</span>
+              <div style="height:4px;background:rgba(255,255,255,0.06);border-radius:100px;overflow:hidden;">
+                <div class="r-bar" style="height:100%;width:${(v/5)*100}%;background:linear-gradient(90deg,#6366f1,#8b5cf6);border-radius:100px;"></div>
+              </div>
+              <span style="font-size:12px;font-weight:700;color:#e2e8f0;text-align:right;">${v}</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+
+      <!-- Pros / Cons -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div style="background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.18);border-radius:14px;padding:16px;">
+          <p style="font-size:11px;font-weight:700;color:#34d399;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;">✓ Strengths</p>
+          <ul style="display:flex;flex-direction:column;gap:8px;margin:0;padding:0;list-style:none;">
+            ${t.pros.map(p=>`<li style="display:flex;gap:8px;font-size:12.5px;color:#d1fae5;line-height:1.5;"><span style="color:#10b981;font-weight:700;flex-shrink:0;margin-top:1px;">+</span>${p}</li>`).join('')}
+          </ul>
+        </div>
+        <div style="background:rgba(239,68,68,0.05);border:1px solid rgba(239,68,68,0.16);border-radius:14px;padding:16px;">
+          <p style="font-size:11px;font-weight:700;color:#f87171;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;">✗ Limitations</p>
+          <ul style="display:flex;flex-direction:column;gap:8px;margin:0;padding:0;list-style:none;">
+            ${t.cons.map(c=>`<li style="display:flex;gap:8px;font-size:12.5px;color:#fecaca;line-height:1.5;"><span style="color:#ef4444;font-weight:700;flex-shrink:0;margin-top:1px;">−</span>${c}</li>`).join('')}
+          </ul>
+        </div>
+      </div>
+
+      <!-- Categories -->
+      <div>
+        <p style="font-size:10px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px;">Categories</p>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;">
+          ${t.tags.map(tag=>`
+            <span style="display:inline-flex;align-items:center;gap:6px;padding:5px 12px;background:${CAT_COLOR[tag]||'#6366f1'}14;border:1px solid ${CAT_COLOR[tag]||'#6366f1'}30;border-radius:100px;font-size:12px;font-weight:500;color:${CAT_COLOR[tag]||'#a5b4fc'};">
+              ${CAT_ICONS[tag]||''} ${tag}
+            </span>
+          `).join('')}
+        </div>
+      </div>
+
+      <!-- CTA row -->
+      <div style="display:flex;gap:10px;padding-top:4px;">
+        <a href="${t.website}" target="_blank" rel="noopener" class="btn-brand" style="flex:1;text-align:center;padding:13px 20px;font-size:14px;text-decoration:none;border:none;display:block;">
+          Visit ${t.name} <span style="opacity:0.8;">→</span>
+        </a>
+        <button onclick="closeModal()" style="padding:13px 20px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.09);border-radius:10px;font-size:13px;font-weight:600;color:#9ca3af;cursor:pointer;transition:all 0.15s;" onmouseover="this.style.background='rgba(255,255,255,0.09)';this.style.color='#e2e8f0'" onmouseout="this.style.background='rgba(255,255,255,0.05)';this.style.color='#9ca3af'">Close</button>
+      </div>
+    </div>
+  `;
+  const m=document.getElementById('modal');
+  m.style.display='flex'; document.body.style.overflow='hidden';
+}
+
+function closeModal() {
+  document.getElementById('modal').style.display='none';
+  document.body.style.overflow='';
+}
+
+/* ────────────────────────────────────────────────────────
+   UPDATE SORT BUTTONS
+──────────────────────────────────────────────────────── */
+function updateSortButtons() {
+  document.querySelectorAll('[data-sort]').forEach(btn=>{
+    btn.classList.toggle('sort-active', btn.dataset.sort===state.sort);
+  });
+}
+
+/* ────────────────────────────────────────────────────────
+   ACTIONS
+──────────────────────────────────────────────────────── */
+function setCategory(cat) {
+  state.category=cat; renderSidebar(); renderGrid();
+  document.getElementById('tools').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function setSort(s) {
+  state.sort=s; updateSortButtons(); renderGrid();
+}
+
+function setView(v) {
+  state.view=v;
+  document.getElementById('gridViewBtn').classList.toggle('active',v==='grid');
+  document.getElementById('listViewBtn').classList.toggle('active',v==='list');
+  renderGrid();
+}
+
+function clearSearch() {
+  state.search='';
+  document.getElementById('searchInput').value='';
+  document.getElementById('heroSearch').value='';
+  document.getElementById('clearBtn').style.display='none';
+  renderGrid();
+}
+
+function resetAll() {
+  state={search:'',category:'All',sort:'popular',view:'grid'};
+  document.getElementById('searchInput').value='';
+  document.getElementById('heroSearch').value='';
+  document.getElementById('clearBtn').style.display='none';
+  document.getElementById('gridViewBtn').classList.add('active');
+  document.getElementById('listViewBtn').classList.remove('active');
+  render();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function render() { renderSidebar(); renderGrid(); updateStats(); }
+
+function updateStats() {
+  const src=allTools&&allTools.length?allTools:TOOLS;
+  document.getElementById('stTotal').textContent=src.length;
+  document.getElementById('stAvg').textContent=(src.reduce((s,t)=>s+t.rating,0)/src.length).toFixed(2)+' ★';
+  document.getElementById('stReviews').textContent=fmt(src.reduce((s,t)=>s+t.reviews,0));
+}
+
+/* ────────────────────────────────────────────────────────
+   RESPONSIVE: show sidebar on large screens
+──────────────────────────────────────────────────────── */
+function checkLayout() {
+  const sb=document.getElementById('sidebar');
+  if(window.innerWidth<1024){ sb.style.display='none'; }
+  else { sb.style.display='block'; }
+}
+window.addEventListener('resize',checkLayout);
+
+/* ────────────────────────────────────────────────────────
+   SEARCH SYNC (header + hero)
+──────────────────────────────────────────────────────── */
+function handleSearch(val) {
+  state.search=val;
+  document.getElementById('clearBtn').style.display=val.trim()?'flex':'none';
+  renderGrid();
+}
+
+document.getElementById('searchInput').addEventListener('input',e=>{
+  document.getElementById('heroSearch').value=e.target.value;
+  handleSearch(e.target.value);
+});
+document.getElementById('heroSearch').addEventListener('input',e=>{
+  document.getElementById('searchInput').value=e.target.value;
+  handleSearch(e.target.value);
+  if(e.target.value.trim()) document.getElementById('tools').scrollIntoView({behavior:'smooth'});
+});
+
+/* ────────────────────────────────────────────────────────
+   KEYBOARD
+──────────────────────────────────────────────────────── */
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape') closeModal();
+  if(e.key==='/'&&document.activeElement.tagName!=='INPUT'){
+    e.preventDefault(); document.getElementById('searchInput').focus();
+  }
+});
+
+/* ────────────────────────────────────────────────────────
+   BOOT
+──────────────────────────────────────────────────────── */
+checkLayout();
+renderFeatured();
+render();
+renderCompareBar();
+// Kick off Supabase fetch (no-op if not configured)
+loadFromSupabase();
+</script>
+</body>
+</html>

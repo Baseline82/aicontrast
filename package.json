@@ -1,0 +1,17 @@
+{
+  "name": "aifinder-discovery",
+  "version": "1.0.0",
+  "description": "AIcontrast auto-discovery script — finds new AI tools daily via GPT-4",
+  "type": "module",
+  "scripts": {
+    "discover": "node discover.js",
+    "start": "node discover.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.0",
+    "openai": "^4.55.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
